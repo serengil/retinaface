@@ -31,15 +31,15 @@ resp = RetinaFace.detect_faces("img1.jpg", threshold = 0.9)
 Then it returns the facial area coordinates and some landmarks (eyes, nose and mouth) with a confidence score.
 
 ```json
-{'face_1': {
-    'score': 0.9993440508842468,
-    'facial_area': [155, 81, 434, 443],
-    'landmarks': {
-      'right_eye': [257.82974, 209.64787],
-      'left_eye': [374.93427, 251.78687],
-      'nose': [303.4773, 299.91144],
-      'mouth_right': [228.37329, 338.73193],
-      'mouth_left': [320.21982, 374.58798]
+{"face_1": {
+    "score": 0.9993440508842468,
+    "facial_area": [155, 81, 434, 443],
+    "landmarks": {
+      "right_eye": [257.82974, 209.64787],
+      "left_eye": [374.93427, 251.78687],
+      "nose": [303.4773, 299.91144],
+      "mouth_right": [228.37329, 338.73193],
+      "mouth_left": [320.21982, 374.58798]
     }
   }
 }
