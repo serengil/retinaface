@@ -7,7 +7,7 @@ RetinaFace is the face detection module of [insightface](https://github.com/deep
 
 This repo is heavily inspired from the study of Stanislas Bertrand. Its source code is simplified and it is transformed to pip compatible but the main structure of the reference model and its pre-trained weights are same.
 
-<p align="center"><img src="https://github.com/serengil/retinaface/blob/master/tests/outputs/img1.jpg" width="90%" height="90%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/img1.jpg" width="90%" height="90%"></p>
 
 Notice that face recognition module of insightface project is called as [ArcFace](https://sefiks.com/2020/12/14/deep-face-recognition-with-arcface-in-keras-and-python/).
 
@@ -57,7 +57,7 @@ for face in faces:
   plt.show()
 ```
 
-<p align="center"><img src="https://github.com/serengil/retinaface/blob/master/tests/outputs/img11-2.jpg" width="90%" height="90%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/img11-2.jpg" width="90%" height="90%"></p>
 
 **FAQ and troubleshooting**
 
