@@ -13,7 +13,7 @@ Notice that face recognition module of insightface project is called as [ArcFace
 
 ## Installation
 
-The easiest way to install retinaface is to download it from pypi.
+The easiest way to install retinaface is to download it from [pypi](https://pypi.org/project/retina-face/).
 
 ```
 pip install retina-face
