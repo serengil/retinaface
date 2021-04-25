@@ -25,7 +25,7 @@ RetinaFace offers a face detection function. It expects an exact path of an imag
 
 ```python
 from retina-face import RetinaFace
-resp = RetinaFace.detect_faces("img1.jpg", threshold = 0.9)
+resp = RetinaFace.detect_faces("img1.jpg")
 ```
 
 Then it returns the facial area coordinates and some landmarks (eyes, nose and mouth) with a confidence score.
