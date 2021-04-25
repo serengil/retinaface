@@ -1,0 +1,15 @@
+__pycache__/*
+retina-face/__pycache__/*
+retina-face/commons/__pycache__/*
+retina-face/model/__pycache__/*
+retina-face/test/__pycache__/*
+retina-face/test/dataset/__pycache__/*
+retina_face.egg-info/*
+build/
+dist/
+Pipfile
+Pipfile.lock
+.mypy_cache/
+.vscode/
+.idea/
+.DS_Store
