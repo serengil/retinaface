@@ -58,7 +58,7 @@ for face in faces:
   plt.show()
 ```
 
-<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/img11-2.jpg" width="90%" height="90%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/alignment-procedure.png" width="80%" height="80%"></p>
 
 **FAQ and troubleshooting**
 
