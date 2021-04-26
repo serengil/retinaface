@@ -2,7 +2,6 @@ from retinaface import RetinaFace
 import matplotlib.pyplot as plt
 import cv2
 
-"""
 img_path = "dataset/img1.jpg"
 img = cv2.imread(img_path)
 
@@ -31,13 +30,13 @@ plt.imshow(img[:, :, ::-1])
 plt.axis('off')
 plt.show()
 cv2.imwrite('outputs/'+img_path.split("/")[1], img)
-"""
+
 #------------------------------
 #alignment
 
 img_path = "dataset/img11.jpg"
 
-resp = RetinaFace.extract_faces(img_path = img_path, align = False)
+resp = RetinaFace.extract_faces(img_path = img_path, align = True)
 
 for img in resp:
     plt.imshow(img[:, :, ::-1])

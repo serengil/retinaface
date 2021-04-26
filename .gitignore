@@ -4,6 +4,7 @@ retinaface/__pycache__/
 retinaface/__pycache__/*
 retinaface/commons/__pycache__/
 retinaface/commons/__pycache__/*
+retinaface/model/__pycache__/
 retinaface/model/__pycache__/*
 retinaface/test/__pycache__/*
 retinaface/test/dataset/__pycache__/*
