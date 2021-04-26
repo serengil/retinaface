@@ -54,7 +54,7 @@ A modern face recognition [pipeline](https://sefiks.com/2020/05/01/a-gentle-intr
 import matplotlib.pyplot as plt
 faces = RetinaFace.extract_faces(img_path = "img.jpg")
 for face in faces:
-  plt.imshow(img)
+  plt.imshow(face)
   plt.show()
 ```
 
