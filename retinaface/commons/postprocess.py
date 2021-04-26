@@ -8,6 +8,7 @@ def findEuclideanDistance(source_representation, test_representation):
     euclidean_distance = np.sqrt(euclidean_distance)
     return euclidean_distance
 
+#this function copied from the deepface repository: https://github.com/serengil/deepface/blob/master/deepface/commons/functions.py
 def alignment_procedure(img, left_eye, right_eye):
 
 	#this function aligns given face in img based on left and right eye coordinates
@@ -55,6 +56,7 @@ def alignment_procedure(img, left_eye, right_eye):
 
 	return img #return img anyway
 
+#this function is copied from the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/retinaface.py
 def bbox_pred(boxes, box_deltas):
     if boxes.shape[0] == 0:
         return np.zeros((0, box_deltas.shape[1]))
@@ -90,6 +92,7 @@ def bbox_pred(boxes, box_deltas):
 
     return pred_boxes
 
+# This function copied from the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/retinaface.py
 def landmark_pred(boxes, landmark_deltas):
     if boxes.shape[0] == 0:
       return np.zeros((0, landmark_deltas.shape[1]))
@@ -104,6 +107,7 @@ def landmark_pred(boxes, landmark_deltas):
         pred[:,i,1] = landmark_deltas[:,i,1]*heights + ctr_y
     return pred
 
+# This function copied from rcnn module of retinaface-tf2 project: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/rcnn/processing/bbox_transform.py
 def clip_boxes(boxes, im_shape):
     # x1 >= 0
     boxes[:, 0::4] = np.maximum(np.minimum(boxes[:, 0::4], im_shape[1] - 1), 0)
@@ -115,6 +119,7 @@ def clip_boxes(boxes, im_shape):
     boxes[:, 3::4] = np.maximum(np.minimum(boxes[:, 3::4], im_shape[0] - 1), 0)
     return boxes
 
+#this function is mainly based on the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/rcnn/cython/anchors.pyx
 def anchors_plane(height, width, stride, base_anchors):
     A = base_anchors.shape[0]
     all_anchors = np.zeros((height, width, A, 4), dtype=np.float32)
@@ -129,6 +134,8 @@ def anchors_plane(height, width, stride, base_anchors):
                 all_anchors[ih, iw, k, 3] = base_anchors[k, 3] + sh
     return all_anchors
 
+#this function is mainly based on the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/rcnn/cython/cpu_nms.pyx
+#Fast R-CNN by Ross Girshick
 def cpu_nms(dets, threshold):
     x1 = dets[:, 0]
     y1 = dets[:, 1]
