@@ -52,7 +52,7 @@ A modern face recognition [pipeline](https://sefiks.com/2020/05/01/a-gentle-intr
 
 ```python
 import matplotlib.pyplot as plt
-faces = RetinaFace.extract_faces(img_path = "img.jpg")
+faces = RetinaFace.extract_faces(img_path = "img.jpg", align = True)
 for face in faces:
   plt.imshow(face)
   plt.show()
