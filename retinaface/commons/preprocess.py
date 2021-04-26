@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 
+#this function is copied from the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/retinaface.py
 def resize_image(img, scales):
     img_w, img_h = img.shape[0:2]
     target_size = scales[0]
@@ -28,6 +29,7 @@ def resize_image(img, scales):
 
     return img, im_scale
 
+#this function is copied from the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/retinaface.py
 def preprocess_image(img):
     pixel_means = np.array([0.0, 0.0, 0.0], dtype=np.float32)
     pixel_stds = np.array([1.0, 1.0, 1.0], dtype=np.float32)
