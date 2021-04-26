@@ -1,9 +1,12 @@
 __pycache__/*
-retina-face/__pycache__/*
-retina-face/commons/__pycache__/*
-retina-face/model/__pycache__/*
-retina-face/test/__pycache__/*
-retina-face/test/dataset/__pycache__/*
+*.pyc
+retinaface/__pycache__/
+retinaface/__pycache__/*
+retinaface/commons/__pycache__/
+retinaface/commons/__pycache__/*
+retinaface/model/__pycache__/*
+retinaface/test/__pycache__/*
+retinaface/test/dataset/__pycache__/*
 retina_face.egg-info/*
 build/
 dist/
@@ -13,3 +16,4 @@ Pipfile.lock
 .vscode/
 .idea/
 .DS_Store
+**/__pycache__/

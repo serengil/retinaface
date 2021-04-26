@@ -173,14 +173,19 @@ def extract_faces(img_path, threshold=0.9, model = None, align = True):
 
     #---------------------------
 
-    if os.path.isfile(img_path) != True:
-        raise ValueError("Confirm that ",img_path," exists")
+    if (type(img_path) == str and img_path != None): #exact image path
 
-    img = cv2.imread(img_path)
+        if os.path.isfile(img_path) != True:
+            raise ValueError("Confirm that ",img_path," exists")
+
+        img = cv2.imread(img_path)
+
+    if (isinstance(img_path, np.ndarray) and img_path.any()): #numpy array
+        img = img_path.copy()
 
     #---------------------------
 
-    obj = detect_faces(img_path = img_path, threshold = threshold, model = model)
+    obj = detect_faces(img_path = img, threshold = threshold, model = model)
 
     for key in obj:
         identity = obj[key]
