@@ -2,10 +2,10 @@ from retinaface import RetinaFace
 import matplotlib.pyplot as plt
 import cv2
 
-img_path = "dataset/img1.jpg"
+img_path = "dataset/img3.jpg"
 img = cv2.imread(img_path)
 
-resp = RetinaFace.detect_faces(img_path, threshold = 0.9)
+resp = RetinaFace.detect_faces(img_path, threshold = 0.5)
 print(resp)
 
 for key in resp:
@@ -23,7 +23,7 @@ for key in resp:
 
     facial_area = identity["facial_area"]
     cv2.rectangle(img, (facial_area[2], facial_area[3]), (facial_area[0], facial_area[1]), (255, 255, 255), 1)
-    facial_img = img[facial_area[1]: facial_area[3], facial_area[0]: facial_area[2]]
+    #facial_img = img[facial_area[1]: facial_area[3], facial_area[0]: facial_area[2]]
     #plt.imshow(facial_img[:, :, ::-1])
 
 plt.imshow(img[:, :, ::-1])
@@ -33,7 +33,7 @@ cv2.imwrite('outputs/'+img_path.split("/")[1], img)
 
 #------------------------------
 #alignment
-
+"""
 img_path = "dataset/img11.jpg"
 
 resp = RetinaFace.extract_faces(img_path = img_path, align = True)
@@ -43,3 +43,4 @@ for img in resp:
     plt.axis('off')
     plt.show()
     cv2.imwrite('outputs/'+img_path.split("/")[1], img)
+"""
