@@ -10,8 +10,6 @@ This repo is heavily inspired from the study of Stanislas Bertrand. Its source c
 
 <p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/img1.jpg" width="90%" height="90%"></p>
 
-Notice that face recognition module of insightface project is called as [ArcFace](https://sefiks.com/2020/12/14/deep-face-recognition-with-arcface-in-keras-and-python/).
-
 ## Installation
 
 The easiest way to install retinaface is to download it from [pypi](https://pypi.org/project/retina-face/).
@@ -60,6 +58,17 @@ for face in faces:
 ```
 
 <p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/alignment-procedure.png" width="80%" height="80%"></p>
+
+**Face Recognition** - [`Demo`](https://youtu.be/WnUVYQP4h44)
+
+Notice that face recognition module of insightface project is [ArcFace](https://sefiks.com/2020/12/14/deep-face-recognition-with-arcface-in-keras-and-python/), and face detection module is RetinaFace. ArcFace and RetinaFace pair is wrapped in [deepface](https://github.com/serengil/deepface) framework. Consider to use deepface if you need an end-to-end face recognition pipeline.
+
+```python
+#!pip install deepface
+from deepface import DeepFace
+obj = DeepFace.verify("img1.jpg", "img2.jpg", model_name = 'ArcFace', detector_backend = 'retinaface')
+print(obj["verified"])
+```
 
 **FAQ and troubleshooting**
 
