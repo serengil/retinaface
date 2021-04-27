@@ -18,6 +18,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent"
     ],
-    python_requires='>=3.8.5',
+    python_requires='>=3.5.5',
     install_requires=["numpy>=1.19.5", "gdown>=3.10.1", "Pillow>=5.2.0", "opencv-python>=4.5.1.48", "tensorflow>=1.9.0"]
 )
