@@ -1,5 +1,6 @@
 # RetinaFace
 
+[![Downloads](https://pepy.tech/badge/retina-face)](https://pepy.tech/project/retina-face)
 [![Stars](https://img.shields.io/github/stars/serengil/retinaface)](https://github.com/serengil/retinaface)
 [![License](http://img.shields.io/:license-MIT-green.svg?style=flat)](https://github.com/serengil/retinaface/blob/master/LICENSE)
 
