@@ -66,7 +66,8 @@ Notice that face recognition module of insightface project is [ArcFace](https://
 ```python
 #!pip install deepface
 from deepface import DeepFace
-obj = DeepFace.verify("img1.jpg", "img2.jpg", model_name = 'ArcFace', detector_backend = 'retinaface')
+obj = DeepFace.verify("img1.jpg", "img2.jpg"
+          , model_name = 'ArcFace', detector_backend = 'retinaface')
 print(obj["verified"])
 ```
 
