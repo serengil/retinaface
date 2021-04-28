@@ -23,7 +23,7 @@ pip install retina-face
 RetinaFace offers a face detection function. It expects an exact path of an image as input.
 
 ```python
-from retina-face import RetinaFace
+from retinaface import RetinaFace
 resp = RetinaFace.detect_faces("img1.jpg")
 ```
 
