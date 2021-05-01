@@ -71,7 +71,7 @@ obj = DeepFace.verify("img1.jpg", "img2.jpg"
 print(obj["verified"])
 ```
 
-<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/retinaface-arcface.png" width="80%" height="80%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/retinaface-arcface.png" width="95%" height="95%"></p>
 
 **FAQ and troubleshooting**
 
