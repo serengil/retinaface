@@ -18,7 +18,7 @@ The easiest way to install retinaface is to download it from [pypi](https://pypi
 pip install retina-face
 ```
 
-**Face Detection**
+**Face Detection** - [`Demo`](https://youtu.be/Wm1DucuQk70)
 
 RetinaFace offers a face detection function. It expects an exact path of an image as input.
 
