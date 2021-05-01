@@ -57,7 +57,7 @@ for face in faces:
   plt.show()
 ```
 
-<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/alignment-procedure.png" width="80%" height="80%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/alignment-procedure.png" width="95%" height="95%"></p>
 
 **Face Recognition** - [`Demo`](https://youtu.be/WnUVYQP4h44)
 
