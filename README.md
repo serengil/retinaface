@@ -71,6 +71,8 @@ obj = DeepFace.verify("img1.jpg", "img2.jpg"
 print(obj["verified"])
 ```
 
+<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/retinaface-arcface.png" width="80%" height="80%"></p>
+
 **FAQ and troubleshooting**
 
 Pre-trained weights of the retinaface model is going to be downloaded from Google Drive once. Download limit of my Google Drive account might be exceeded sometimes. In this case, you will have an exception like **"too many users have viewed or downloaded this file recently. Please try accessing the file again later"**. Still, you can access the pre-trained weights on Google Drive. Please, download it [here](https://drive.google.com/uc?id=1K3Eq2k1b9dpKkucZjPAiCCnNzfCMosK4) and copy to the HOME/.deepface/weights folder manually.
