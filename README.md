@@ -57,7 +57,7 @@ for face in faces:
   plt.show()
 ```
 
-<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/alignment-procedure.png" width="95%" height="95%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/alignment-procedure.png" width="80%" height="80%"></p>
 
 **Face Recognition** - [`Demo`](https://youtu.be/WnUVYQP4h44)
 
@@ -71,7 +71,9 @@ obj = DeepFace.verify("img1.jpg", "img2.jpg"
 print(obj["verified"])
 ```
 
-<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/retinaface-arcface.png" width="80%" height="80%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/retinaface-arcface.png" width="100%" height="100%"></p>
+
+Notice that ArcFace got 99.40% accuracy on LFW data set whereas human beings just got 97.53%.
 
 **FAQ and troubleshooting**
 
