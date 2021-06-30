@@ -130,16 +130,9 @@ def clip_boxes(boxes, im_shape):
 #this function is mainly based on the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/rcnn/cython/anchors.pyx
 def anchors_plane(height, width, stride, base_anchors):
 	A = base_anchors.shape[0]
-	all_anchors = np.zeros((height, width, A, 4), dtype=np.float32)
-	for iw in range(width):
-		sw = iw * stride
-		for ih in range(height):
-			sh = ih * stride
-			for k in range(A):
-				all_anchors[ih, iw, k, 0] = base_anchors[k, 0] + sw
-				all_anchors[ih, iw, k, 1] = base_anchors[k, 1] + sh
-				all_anchors[ih, iw, k, 2] = base_anchors[k, 2] + sw
-				all_anchors[ih, iw, k, 3] = base_anchors[k, 3] + sh
+	c_0_2 = np.tile(np.arange(0, width)[np.newaxis, :, np.newaxis, np.newaxis], (height, 1, A, 1))
+	c_1_3 = np.tile(np.arange(0, height)[:, np.newaxis, np.newaxis, np.newaxis], (1, width, A, 1))
+	all_anchors = np.concatenate([c_0_2, c_1_3, c_0_2, c_1_3], axis=-1) * stride + np.tile(base_anchors[np.newaxis, np.newaxis, :, :], (height, width, 1, 1))
 	return all_anchors
 
 #this function is mainly based on the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/rcnn/cython/cpu_nms.pyx
