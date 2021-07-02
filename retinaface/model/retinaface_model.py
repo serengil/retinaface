@@ -18,7 +18,8 @@ def load_weights(model):
     home = str(Path.home())
     exact_file = home+'/.deepface/weights/retinaface.h5'
     #url = 'https://drive.google.com/file/d/1K3Eq2k1b9dpKkucZjPAiCCnNzfCMosK4'
-    url = 'https://drive.google.com/uc?id=1K3Eq2k1b9dpKkucZjPAiCCnNzfCMosK4'
+    #url = 'https://drive.google.com/uc?id=1K3Eq2k1b9dpKkucZjPAiCCnNzfCMosK4'
+    url = 'https://github.com/serengil/deepface_models/releases/download/v1.0/retinaface.h5'
 
     #-----------------------------
 
