@@ -77,18 +77,6 @@ print(obj["verified"])
 
 Notice that ArcFace got 99.40% accuracy on LFW data set whereas human beings just got 97.53%.
 
-**FAQ and troubleshooting**
-
-Pre-trained weights of the retinaface model is going to be downloaded from Google Drive once. Download limit of my Google Drive account might be exceeded sometimes. In this case, you will have an exception like **"too many users have viewed or downloaded this file recently. Please try accessing the file again later"**. Still, you can access the pre-trained weights on Google Drive. Please, download it [here](https://drive.google.com/uc?id=1K3Eq2k1b9dpKkucZjPAiCCnNzfCMosK4) and copy to the HOME/.deepface/weights folder manually.
-
-You can find out your HOME_FOLDER with python as shown below.
-
-```python
-from pathlib import Path
-home = str(Path.home())
-print("HOME_FOLDER is ",home)
-```
-
 ## Support
 
 There are many ways to support a project. Starring⭐️ the repo is just one🙏
