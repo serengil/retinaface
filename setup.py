@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="retina-face", #pip install retina-face
-    version="0.0.4",
+    version="0.0.5",
     author="Sefik Ilkin Serengil",
     author_email="serengil@gmail.com",
     description="RetinaFace: Deep Face Detection Framework in TensorFlow for Python",
