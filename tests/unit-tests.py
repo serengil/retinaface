@@ -8,6 +8,9 @@ img = cv2.imread(img_path)
 resp = RetinaFace.detect_faces(img_path, threshold = 0.5)
 print(resp)
 
+def int_tuple(t):
+    return tuple(int(x) for x in t)
+
 for key in resp:
     identity = resp[key]
 
@@ -15,11 +18,11 @@ for key in resp:
 
     landmarks = identity["landmarks"]
     diameter = 1
-    cv2.circle(img, tuple(landmarks["left_eye"]), diameter, (0, 0, 255), -1)
-    cv2.circle(img, tuple(landmarks["right_eye"]), diameter, (0, 0, 255), -1)
-    cv2.circle(img, tuple(landmarks["nose"]), diameter, (0, 0, 255), -1)
-    cv2.circle(img, tuple(landmarks["mouth_left"]), diameter, (0, 0, 255), -1)
-    cv2.circle(img, tuple(landmarks["mouth_right"]), diameter, (0, 0, 255), -1)
+    cv2.circle(img, int_tuple(landmarks["left_eye"]), diameter, (0, 0, 255), -1)
+    cv2.circle(img, int_tuple(landmarks["right_eye"]), diameter, (0, 0, 255), -1)
+    cv2.circle(img, int_tuple(landmarks["nose"]), diameter, (0, 0, 255), -1)
+    cv2.circle(img, int_tuple(landmarks["mouth_left"]), diameter, (0, 0, 255), -1)
+    cv2.circle(img, int_tuple(landmarks["mouth_right"]), diameter, (0, 0, 255), -1)
 
     facial_area = identity["facial_area"]
     cv2.rectangle(img, (facial_area[2], facial_area[3]), (facial_area[0], facial_area[1]), (255, 255, 255), 1)
