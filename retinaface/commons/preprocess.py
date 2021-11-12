@@ -3,7 +3,7 @@ import cv2
 
 #this function is copied from the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/retinaface.py
 def resize_image(img, scales):
-    img_w, img_h = img.shape[0:2]
+    img_h, img_w = img.shape[0:2]
     target_size = scales[0]
     max_size = scales[1]
 
@@ -12,7 +12,7 @@ def resize_image(img, scales):
     else:
         im_size_min, im_size_max = img_w, img_h
 
-    im_scale = target_size / float(im_size_min)
+    im_scale = min(1.0, target_size / float(im_size_min))
 
     if np.round(im_scale * im_size_max) > max_size:
         im_scale = max_size / float(im_size_max)
