@@ -108,6 +108,8 @@ Besides, if you are using this re-implementation, please consider to cite the fo
 }
 ```
 
+Finally, if you use this RetinaFace re-implementation in your GitHub projects, please add retina-face dependency in the requirements.txt.
+
 ## Licence
 
 This project is licensed under the MIT License - see [`LICENSE`](https://github.com/serengil/retinaface/blob/master/LICENSE) for more details.
