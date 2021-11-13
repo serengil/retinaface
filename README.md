@@ -96,20 +96,7 @@ If you are using RetinaFace in your research, please consider to cite its origin
 }
 ```
 
-Besides, if you are using this re-implementation, please consider to cite the following research papers as well. Here are examples of BibTeX entries:
-
-```BibTeX
-@inproceedings{serengil2020lightface,
-  title        = {LightFace: A Hybrid Deep Face Recognition Framework},
-  author       = {Serengil, Sefik Ilkin and Ozpinar, Alper},
-  booktitle    = {2020 Innovations in Intelligent Systems and Applications Conference (ASYU)},
-  pages        = {23-27},
-  year         = {2020},
-  doi          = {10.1109/ASYU50717.2020.9259802},
-  url          = {https://doi.org/10.1109/ASYU50717.2020.9259802}
-  organization = {IEEE}
-}
-```
+Besides, if you are using this re-implementation, please consider to cite the following research paper as well. Here is an example of BibTeX entry:
 
 ```BibTeX
 @inproceedings{serengil2021lightface,
