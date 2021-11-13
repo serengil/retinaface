@@ -83,6 +83,44 @@ There are many ways to support a project. Starring⭐️ the repo is just one�
 
 This work is mainly based on the [insightface](https://github.com/deepinsight/insightface) project and [retinaface](https://arxiv.org/pdf/1905.00641.pdf) paper; and it is heavily inspired from the re-implementation of [retinaface-tf2](https://github.com/StanislasBertrand/RetinaFace-tf2) by [Stanislas Bertrand](https://github.com/StanislasBertrand). Finally, Bertrand's [implemenation](https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/rcnn/cython/cpu_nms.pyx) uses [Fast R-CNN](https://arxiv.org/abs/1504.08083) written by [Ross Girshick](https://github.com/rbgirshick/fast-rcnn) in the background. All of those reference studies are licensed under MIT license.
 
+## Citation
+
+If you are using RetinaFace in your research, please consider to cite its original research paper.
+
+```BibTeX
+@inproceedings{deng2020retinaface,
+  title        = {Retinaface: Single-stage dense face localisation in the wild},
+  author       = {Deng, Jiankang and Guo, Jia and Ververas, Evangelos and Kotsia, Irene and Zafeiriou, Stefanos},
+  booktitle    = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  year         = {2020}
+}
+```
+
+Besides, if you are using this re-implementation, please consider to cite the following research papers as well. Here are examples of BibTeX entries:
+
+```BibTeX
+@inproceedings{serengil2020lightface,
+  title        = {LightFace: A Hybrid Deep Face Recognition Framework},
+  author       = {Serengil, Sefik Ilkin and Ozpinar, Alper},
+  booktitle    = {2020 Innovations in Intelligent Systems and Applications Conference (ASYU)},
+  pages        = {23-27},
+  year         = {2020},
+  doi          = {10.1109/ASYU50717.2020.9259802},
+  url          = {https://doi.org/10.1109/ASYU50717.2020.9259802}
+  organization = {IEEE}
+}
+```
+
+```BibTeX
+@inproceedings{serengil2021lightface,
+  title        = {HyperExtended LightFace: A Facial Attribute Analysis Framework},
+  author       = {Serengil, Sefik Ilkin and Ozpinar, Alper},
+  booktitle    = {2021 International Conference on Engineering and Emerging Technologies (ICEET)},
+  year         = {2021},
+  organization = {IEEE}
+}
+```
+
 ## Licence
 
 This project is licensed under the MIT License - see [`LICENSE`](https://github.com/serengil/retinaface/blob/master/LICENSE) for more details.
