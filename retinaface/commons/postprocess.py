@@ -45,6 +45,7 @@ def alignment_procedure(img, left_eye, right_eye, nose):
 	if b != 0 and c != 0: #this multiplication causes division by zero in cos_a calculation
 
 		cos_a = (b*b + c*c - a*a)/(2*b*c)
+		cos_a = min(1.0, max(-1.0, cos_a))
 		angle = np.arccos(cos_a) #angle in radian
 		angle = (angle * 180) / math.pi #radian to degree
 
