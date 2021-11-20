@@ -45,7 +45,12 @@ def alignment_procedure(img, left_eye, right_eye, nose):
 	if b != 0 and c != 0: #this multiplication causes division by zero in cos_a calculation
 
 		cos_a = (b*b + c*c - a*a)/(2*b*c)
+		
+		#PR15: While mathematically cos_a must be within the closed range [-1.0, 1.0], floating point errors would produce cases violating this
+		#In fact, we did come across a case where cos_a took the value 1.0000000169176173, which lead to a NaN from the following np.arccos step
 		cos_a = min(1.0, max(-1.0, cos_a))
+		
+		
 		angle = np.arccos(cos_a) #angle in radian
 		angle = (angle * 180) / math.pi #radian to degree
 
