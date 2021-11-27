@@ -45,7 +45,7 @@ def detect_faces(img_path, threshold=0.9, model = None):
 
 		img = cv2.imread(img_path)
 
-	elif isinstance(img_path, np.ndarray): #numpy array
+	elif (isinstance(img_path, np.ndarray) and img_path.any()): #numpy array
 		img = img_path.copy()
 
 	else:
