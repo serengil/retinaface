@@ -48,9 +48,6 @@ def detect_faces(img_path, threshold=0.9, model = None):
 	elif isinstance(img_path, np.ndarray): #numpy array
 		img = img_path.copy()
 
-		if not img.any():
-			raise ValueError("Input image array contains all black pixels.")
-
 	else:
 		raise ValueError("Invalid input.")
 
