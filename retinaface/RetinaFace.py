@@ -49,7 +49,9 @@ def detect_faces(img_path, threshold=0.9, model = None):
 		img = img_path.copy()
 
 	else:
-		raise ValueError("Invalid input.")
+		raise ValueError(
+			"Invalid input. Accept only path to image file or a NumPy array."
+		)
 
 	#---------------------------
 
