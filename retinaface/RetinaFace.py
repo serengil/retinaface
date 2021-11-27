@@ -28,7 +28,7 @@ def build_model():
 	
 	global model #singleton design pattern
 	
-	if not "model_obj" in globals():
+	if not "model" in globals():
 		
 		model = tf.function(
 			retinaface_model.build_model(),
