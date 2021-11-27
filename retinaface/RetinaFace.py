@@ -45,8 +45,13 @@ def detect_faces(img_path, threshold=0.9, model = None):
 
 		img = cv2.imread(img_path)
 
-	if (isinstance(img_path, np.ndarray) and img_path.any()): #numpy array
+	elif isinstance(img_path, np.ndarray): #numpy array
 		img = img_path.copy()
+
+	else:
+		raise ValueError(
+			"Invalid input. Accept only path to image file or a NumPy array."
+		)
 
 	#---------------------------
 
