@@ -25,11 +25,15 @@ if tf_version == 2:
 #---------------------------
 
 def build_model():
-
-	model = tf.function(
-		retinaface_model.build_model(),
-		input_signature=(tf.TensorSpec(shape=[None, None, None, 3], dtype=np.float32),)
-	)
+	
+	global model #singleton design pattern
+	
+	if not "model_obj" in globals():
+		
+		model = tf.function(
+			retinaface_model.build_model(),
+			input_signature=(tf.TensorSpec(shape=[None, None, None, 3], dtype=np.float32),)
+		)
 
 	return model
 
