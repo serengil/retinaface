@@ -37,25 +37,28 @@ def build_model():
 
 	return model
 
-def detect_faces(img_path, threshold=0.9, model = None):
-	"""
-	TODO: add function doc here
-	"""
-
-	if (type(img_path) == str and img_path != None): #exact image path
+def get_image(img_path):
+	if (type(img_path) == str and img_path != None):  # exact image path
 
 		if os.path.isfile(img_path) != True:
-			raise ValueError("Confirm that ",img_path," exists")
+			raise ValueError("Confirm that ", img_path, " exists")
 
-		img = cv2.imread(img_path)
+		return cv2.imread(img_path)
 
-	elif (isinstance(img_path, np.ndarray) and img_path.any()): #numpy array
-		img = img_path.copy()
+	elif (isinstance(img_path, np.ndarray) and img_path.any()):  # numpy array
+		return img_path.copy()
 
 	else:
 		raise ValueError(
 			"Invalid input. Accept only path to image file or a NumPy array."
 		)
+
+def detect_faces(img_path, threshold=0.9, model = None):
+	"""
+	TODO: add function doc here
+	"""
+
+	img = get_image(img_path)
 
 	#---------------------------
 
@@ -182,15 +185,7 @@ def extract_faces(img_path, threshold=0.9, model = None, align = True):
 
 	#---------------------------
 
-	if (type(img_path) == str and img_path != None): #exact image path
-
-		if os.path.isfile(img_path) != True:
-			raise ValueError("Confirm that ",img_path," exists")
-
-		img = cv2.imread(img_path)
-
-	if (isinstance(img_path, np.ndarray) and img_path.any()): #numpy array
-		img = img_path.copy()
+	img = get_image(img_path)
 
 	#---------------------------
 
