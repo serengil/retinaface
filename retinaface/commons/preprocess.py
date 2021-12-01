@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 
 #this function is copied from the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/retinaface.py
-def resize_image(img, scales):
+def resize_image(img, scales, allow_upscaling):
     img_h, img_w = img.shape[0:2]
     target_size = scales[0]
     max_size = scales[1]
@@ -12,7 +12,9 @@ def resize_image(img, scales):
     else:
         im_size_min, im_size_max = img_w, img_h
 
-    im_scale = min(1.0, target_size / float(im_size_min))
+    im_scale = target_size / float(im_size_min)
+    if not allow_upscaling:
+        im_scale = min(1.0, im_scale)
 
     if np.round(im_scale * im_size_max) > max_size:
         im_scale = max_size / float(im_size_max)
@@ -30,13 +32,13 @@ def resize_image(img, scales):
     return img, im_scale
 
 #this function is copied from the following code snippet: https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/retinaface.py
-def preprocess_image(img):
+def preprocess_image(img, allow_upscaling):
     pixel_means = np.array([0.0, 0.0, 0.0], dtype=np.float32)
     pixel_stds = np.array([1.0, 1.0, 1.0], dtype=np.float32)
     pixel_scale = float(1.0)
     scales = [1024, 1980]
 
-    img, im_scale = resize_image(img, scales)
+    img, im_scale = resize_image(img, scales, allow_upscaling)
     img = img.astype(np.float32)
     im_tensor = np.zeros((1, img.shape[0], img.shape[1], img.shape[2]), dtype=np.float32)
 

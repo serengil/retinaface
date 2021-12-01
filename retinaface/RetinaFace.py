@@ -55,7 +55,7 @@ def get_image(img_path):
 
     return img
 
-def detect_faces(img_path, threshold=0.9, model = None):
+def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
     """
     TODO: add function doc here
     """
@@ -86,7 +86,7 @@ def detect_faces(img_path, threshold=0.9, model = None):
     proposals_list = []
     scores_list = []
     landmarks_list = []
-    im_tensor, im_info, im_scale = preprocess.preprocess_image(img)
+    im_tensor, im_info, im_scale = preprocess.preprocess_image(img, allow_upscaling)
     net_out = model(im_tensor)
     net_out = [elt.numpy() for elt in net_out]
     sym_idx = 0
@@ -181,7 +181,7 @@ def detect_faces(img_path, threshold=0.9, model = None):
 
     return resp
 
-def extract_faces(img_path, threshold=0.9, model = None, align = True):
+def extract_faces(img_path, threshold=0.9, model = None, align = True, allow_upscaling = True):
 
     resp = []
 
@@ -191,7 +191,7 @@ def extract_faces(img_path, threshold=0.9, model = None, align = True):
 
     #---------------------------
 
-    obj = detect_faces(img_path = img, threshold = threshold, model = model)
+    obj = detect_faces(img_path = img, threshold = threshold, model = model, allow_upscaling = allow_upscaling)
 
     if type(obj) == dict:
         for key in obj:
