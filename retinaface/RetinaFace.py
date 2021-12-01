@@ -38,20 +38,22 @@ def build_model():
     return model
 
 def get_image(img_path):
-    if (type(img_path) == str and img_path != None):  # exact image path
+    if type(img_path) == str:  # Load from file path
+        if not os.path.isfile(img_path):
+            raise ValueError("Input image file path (", img_path, ") does not exist.")
+        img = cv2.imread(img_path)
 
-        if os.path.isfile(img_path) != True:
-            raise ValueError("Confirm that ", img_path, " exists")
-
-        return cv2.imread(img_path)
-
-    elif (isinstance(img_path, np.ndarray) and img_path.any()):  # numpy array
-        return img_path.copy()
+    elif isinstance(img_path, np.ndarray):  # Use given NumPy array
+        img = img_path.copy()
 
     else:
-        raise ValueError(
-            "Invalid input. Accept only path to image file or a NumPy array."
-        )
+        raise ValueError("Invalid image input. Only file paths or a NumPy array accepted.")
+
+    # Validate image shape
+    if len(img.shape) != 3 or np.prod(img.shape) == 0:
+        raise ValueError("Input image needs to have 3 channels at must not be empty.")
+
+    return img
 
 def detect_faces(img_path, threshold=0.9, model = None):
     """
