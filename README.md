@@ -85,18 +85,7 @@ This work is mainly based on the [insightface](https://github.com/deepinsight/in
 
 ## Citation
 
-If you are using RetinaFace in your research, please consider to cite its original research paper.
-
-```BibTeX
-@inproceedings{deng2020retinaface,
-  title        = {Retinaface: Single-stage dense face localisation in the wild},
-  author       = {Deng, Jiankang and Guo, Jia and Ververas, Evangelos and Kotsia, Irene and Zafeiriou, Stefanos},
-  booktitle    = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
-  year         = {2020}
-}
-```
-
-Besides, if you are using this re-implementation, please consider to cite the following research paper as well. Here is an example of BibTeX entry:
+If you are using RetinaFace in your research, please consider to cite its [original research paper](https://arxiv.org/abs/1905.00641). Besides, if you are using this re-implementation of retinaface, please consider to cite the following research paper as well. Here is an example of BibTeX entry:
 
 ```BibTeX
 @inproceedings{serengil2021lightface,
