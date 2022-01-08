@@ -78,7 +78,7 @@ Notice that ArcFace got 99.40% accuracy on LFW data set whereas human beings jus
 
 ## Support
 
-There are many ways to support a project. Starring⭐️ the repo is just one🙏
+There are many ways to support a project. Starring⭐️ the repo is just one 🙏
 
 ## Acknowledgements
 
