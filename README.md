@@ -1,7 +1,7 @@
 # RetinaFace
 
 [![Downloads](https://pepy.tech/badge/retina-face)](https://pepy.tech/project/retina-face)
-[![Stars](https://img.shields.io/github/stars/serengil/retinaface)](https://github.com/serengil/retinaface)
+[![Stars](https://img.shields.io/github/stars/serengil/retinaface?color=yellow)](https://github.com/serengil/retinaface)
 [![License](http://img.shields.io/:license-MIT-green.svg?style=flat)](https://github.com/serengil/retinaface/blob/master/LICENSE)
 [![DOI](http://img.shields.io/:DOI-10.1109/ICEET53442.2021.9659697-blue.svg?style=flat)](https://doi.org/10.1109/ICEET53442.2021.9659697)
 
