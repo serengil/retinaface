@@ -108,7 +108,7 @@ If you are using RetinaFace in your research, please consider to cite its [origi
   pages        = {1-4},
   year         = {2021},
   doi          = {10.1109/ICEET53442.2021.9659697},
-  url.         = {https://doi.org/10.1109/ICEET53442.2021.9659697},
+  url          = {https://doi.org/10.1109/ICEET53442.2021.9659697},
   organization = {IEEE}
 }
 ```
