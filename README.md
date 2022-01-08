@@ -1,9 +1,10 @@
 # RetinaFace
 
 [![Downloads](https://pepy.tech/badge/retina-face)](https://pepy.tech/project/retina-face)
-[![Stars](https://img.shields.io/github/stars/serengil/retinaface)](https://github.com/serengil/retinaface)
+[![Stars](https://img.shields.io/github/stars/serengil/retinaface?color=yellow)](https://github.com/serengil/retinaface)
 [![License](http://img.shields.io/:license-MIT-green.svg?style=flat)](https://github.com/serengil/retinaface/blob/master/LICENSE)
 [![DOI](http://img.shields.io/:DOI-10.1109/ICEET53442.2021.9659697-blue.svg?style=flat)](https://doi.org/10.1109/ICEET53442.2021.9659697)
+[![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dserengil%26type%3Dpatrons&style=flat)](https://patreon.com/serengil)
 
 RetinaFace is a deep learning based cutting-edge facial detector for Python coming with facial landmarks.
 
@@ -78,7 +79,7 @@ Notice that ArcFace got 99.40% accuracy on LFW data set whereas human beings jus
 
 ## Support
 
-There are many ways to support a project. Starring⭐️ the repo is just one🙏
+There are many ways to support a project. Starring⭐️ the repo is just one 🙏
 
 ## Acknowledgements
 
