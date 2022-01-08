@@ -40,14 +40,13 @@ cv2.imwrite('outputs/'+img_path.split("/")[1], img)
 
 #------------------------------
 #alignment
-"""
+
 img_path = "dataset/img11.jpg"
 
 resp = RetinaFace.extract_faces(img_path = img_path, align = True)
 
 for img in resp:
-    plt.imshow(img[:, :, ::-1])
+    plt.imshow(img)
     plt.axis('off')
     plt.show()
-    cv2.imwrite('outputs/'+img_path.split("/")[1], img)
-"""
+    cv2.imwrite('outputs/'+img_path.split("/")[1], img[:, :, ::-1])
