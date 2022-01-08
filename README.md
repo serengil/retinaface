@@ -81,6 +81,12 @@ Notice that ArcFace got 99.40% accuracy on LFW data set whereas human beings jus
 
 There are many ways to support a project. Starring⭐️ the repo is just one 🙏
 
+You can also support this work on [Patreon](https://patreon.com/serengil)
+
+<a href="https://patreon.com/serengil">
+<img src="https://raw.githubusercontent.com/serengil/retinaface/master/icons/patreon.png" width="30%" height="30%">
+</a>
+
 ## Acknowledgements
 
 This work is mainly based on the [insightface](https://github.com/deepinsight/insightface) project and [retinaface](https://arxiv.org/pdf/1905.00641.pdf) paper; and it is heavily inspired from the re-implementation of [retinaface-tf2](https://github.com/StanislasBertrand/RetinaFace-tf2) by [Stanislas Bertrand](https://github.com/StanislasBertrand). Finally, Bertrand's [implemenation](https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/rcnn/cython/cpu_nms.pyx) uses [Fast R-CNN](https://arxiv.org/abs/1504.08083) written by [Ross Girshick](https://github.com/rbgirshick/fast-rcnn) in the background. All of those reference studies are licensed under MIT license.
