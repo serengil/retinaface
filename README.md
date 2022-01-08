@@ -20,16 +20,21 @@ The easiest way to install retinaface is to download it from [pypi](https://pypi
 pip install retina-face
 ```
 
+Then, you will be able to import the library and use its functionalities.
+
+```python
+from retinaface import RetinaFace
+```
+
 **Face Detection** - [`Demo`](https://youtu.be/Wm1DucuQk70)
 
 RetinaFace offers a face detection function. It expects an exact path of an image as input.
 
 ```python
-from retinaface import RetinaFace
 resp = RetinaFace.detect_faces("img1.jpg")
 ```
 
-Then it returns the facial area coordinates and some landmarks (eyes, nose and mouth) with a confidence score.
+Then, it will return the facial area coordinates and some landmarks (eyes, nose and mouth) with a confidence score.
 
 ```json
 {
@@ -63,7 +68,7 @@ for face in faces:
 
 **Face Recognition** - [`Demo`](https://youtu.be/WnUVYQP4h44)
 
-Notice that face recognition module of insightface project is [ArcFace](https://sefiks.com/2020/12/14/deep-face-recognition-with-arcface-in-keras-and-python/), and face detection module is RetinaFace. ArcFace and RetinaFace pair is wrapped in [deepface](https://github.com/serengil/deepface) framework. Consider to use deepface if you need an end-to-end face recognition pipeline.
+Notice that face recognition module of insightface project is [ArcFace](https://sefiks.com/2020/12/14/deep-face-recognition-with-arcface-in-keras-and-python/), and face detection module is RetinaFace. ArcFace and RetinaFace pair is wrapped in [deepface](https://github.com/serengil/deepface) library for Python. Consider to use deepface if you need an end-to-end face recognition pipeline.
 
 ```python
 #!pip install deepface
@@ -75,7 +80,7 @@ print(obj["verified"])
 
 <p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/retinaface-arcface.png" width="100%" height="100%"></p>
 
-Notice that ArcFace got 99.40% accuracy on LFW data set whereas human beings just got 97.53%.
+Notice that ArcFace got 99.40% accuracy on [LFW data set](https://sefiks.com/2020/08/27/labeled-faces-in-the-wild-for-face-recognition/) whereas human beings just have 97.53% confidence.
 
 ## Support
 
