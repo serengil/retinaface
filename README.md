@@ -3,6 +3,7 @@
 [![Downloads](https://pepy.tech/badge/retina-face)](https://pepy.tech/project/retina-face)
 [![Stars](https://img.shields.io/github/stars/serengil/retinaface)](https://github.com/serengil/retinaface)
 [![License](http://img.shields.io/:license-MIT-green.svg?style=flat)](https://github.com/serengil/retinaface/blob/master/LICENSE)
+[![DOI](http://img.shields.io/:DOI-10.1109/ICEET53442.2021.9659697-blue.svg?style=flat)](https://doi.org/10.1109/ICEET53442.2021.9659697)
 
 RetinaFace is a deep learning based cutting-edge facial detector for Python coming with facial landmarks.
 
@@ -92,7 +93,10 @@ If you are using RetinaFace in your research, please consider to cite its [origi
   title        = {HyperExtended LightFace: A Facial Attribute Analysis Framework},
   author       = {Serengil, Sefik Ilkin and Ozpinar, Alper},
   booktitle    = {2021 International Conference on Engineering and Emerging Technologies (ICEET)},
+  pages        = {1-4},
   year         = {2021},
+  doi          = {10.1109/ICEET53442.2021.9659697},
+  url.         = {https://doi.org/10.1109/ICEET53442.2021.9659697},
   organization = {IEEE}
 }
 ```
