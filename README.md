@@ -14,7 +14,7 @@ RetinaFace is the face detection module of [insightface](https://github.com/deep
 
 ## Installation
 
-The easiest way to install retinaface is to download it from [pypi](https://pypi.org/project/retina-face/).
+The easiest way to install retinaface is to download it from [PyPI](https://pypi.org/project/retina-face/). It's going to install the library itself and its prerequisites as well.
 
 ```
 pip install retina-face
