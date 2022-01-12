@@ -89,7 +89,7 @@ There are many ways to support a project. Starring⭐️ the repo is just one �
 
 You can also support this work on [Patreon](https://patreon.com/serengil)
 
-<a href="https://patreon.com/serengil">
+<a href="https://www.patreon.com/bePatron?u=31795557&redirect_uri=https%3A%2F%2Fgithub.com%2Fserengil%2Fretinaface%2F">
 <img src="https://raw.githubusercontent.com/serengil/retinaface/master/icons/patreon.png" width="30%" height="30%">
 </a>
 
