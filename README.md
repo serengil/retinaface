@@ -86,7 +86,7 @@ Notice that ArcFace got 99.40% accuracy on [LFW data set](https://sefiks.com/202
 
 There are many ways to support a project. Starring⭐️ the repo is just one 🙏
 
-You can also support this work on [Patreon](https://patreon.com/serengil)
+You can also support this work on [Patreon](https://www.patreon.com/bePatron?u=31795557&redirect_uri=https%3A%2F%2Fgithub.com%2Fserengil%2Fretinaface%2F)
 
 <a href="https://www.patreon.com/bePatron?u=31795557&redirect_uri=https%3A%2F%2Fgithub.com%2Fserengil%2Fretinaface%2F">
 <img src="https://raw.githubusercontent.com/serengil/retinaface/master/icons/patreon.png" width="30%" height="30%">
