@@ -41,12 +41,14 @@ cv2.imwrite('outputs/'+img_path.split("/")[1], img)
 #------------------------------
 #alignment
 
-img_path = "dataset/img11.jpg"
+img_paths = ["dataset/img11.jpg", "dataset/img4.jpg", "dataset/img5.jpg", "dataset/img6.jpg"]
 
-resp = RetinaFace.extract_faces(img_path = img_path, align = True)
+for img_path in img_paths:
 
-for img in resp:
-    plt.imshow(img)
-    plt.axis('off')
-    plt.show()
-    cv2.imwrite('outputs/'+img_path.split("/")[1], img[:, :, ::-1])
+    resp = RetinaFace.extract_faces(img_path = img_path, align = True)
+
+    for img in resp:
+        plt.imshow(img)
+        plt.axis('off')
+        plt.show()
+        cv2.imwrite('outputs/'+img_path.split("/")[1], img[:, :, ::-1])
