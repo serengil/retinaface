@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 import math
+import cv2
 
 def findEuclideanDistance(source_representation, test_representation):
     euclidean_distance = source_representation - test_representation
@@ -13,13 +14,23 @@ def alignment_procedure(img, left_eye, right_eye, nose):
 
     #this function aligns given face in img based on left and right eye coordinates
 
+    #left eye is the eye appearing on the left (right eye of the person)
+    #left top point is (0, 0)
+
     left_eye_x, left_eye_y = left_eye
     right_eye_x, right_eye_y = right_eye
 
     #-----------------------
-    upside_down = False
-    if nose[1] < left_eye[1] or nose[1] < right_eye[1]:
-        upside_down = True
+    #decide the image is inverse
+
+    center_eyes = (int((left_eye_x + right_eye_x) / 2), int((left_eye_y + right_eye_y) / 2))
+    
+    if False:
+
+        img = cv2.circle(img, (int(left_eye[0]), int(left_eye[1])), 2, (0, 255, 255), 2)
+        img = cv2.circle(img, (int(right_eye[0]), int(right_eye[1])), 2, (255, 0, 0), 2)
+        img = cv2.circle(img, center_eyes, 2, (0, 0, 255), 2)
+        img = cv2.circle(img, (int(nose[0]), int(nose[1])), 2, (255, 255, 255), 2)
 
     #-----------------------
     #find rotation direction
@@ -53,6 +64,7 @@ def alignment_procedure(img, left_eye, right_eye, nose):
         
         angle = np.arccos(cos_a) #angle in radian
         angle = (angle * 180) / math.pi #radian to degree
+        print(angle)
 
         #-----------------------
         #rotate base image
@@ -60,11 +72,12 @@ def alignment_procedure(img, left_eye, right_eye, nose):
         if direction == -1:
             angle = 90 - angle
 
-        if upside_down == True:
-            angle = angle + 90
-
         img = Image.fromarray(img)
         img = np.array(img.rotate(direction * angle))
+
+        if center_eyes[1] > nose[1]:
+            img = Image.fromarray(img)
+            img = np.array(img.rotate(180))
 
     #-----------------------
 
