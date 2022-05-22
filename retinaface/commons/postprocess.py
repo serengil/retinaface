@@ -64,7 +64,6 @@ def alignment_procedure(img, left_eye, right_eye, nose):
         
         angle = np.arccos(cos_a) #angle in radian
         angle = (angle * 180) / math.pi #radian to degree
-        print(angle)
 
         #-----------------------
         #rotate base image
