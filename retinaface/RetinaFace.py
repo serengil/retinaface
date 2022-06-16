@@ -181,7 +181,7 @@ def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
 
     return resp
 
-def extract_faces(img_path, threshold=0.9, model = None, align = True, allow_upscaling = True):
+def extract_faces(img_path, threshold=0.9, model = None, align = True, allow_upscaling = True, return_location = False):
 
     resp = []
 
@@ -210,7 +210,10 @@ def extract_faces(img_path, threshold=0.9, model = None, align = True, allow_ups
 
                 facial_img = postprocess.alignment_procedure(facial_img, right_eye, left_eye, nose)
 
-            resp.append(facial_img[:, :, ::-1])
+            if return_location:
+                resp.append([facial_img[:, :, ::-1], facial_area])
+            else:
+                resp.append(facial_img[:, :, ::-1])
     #elif type(obj) == tuple:
 
     return resp
