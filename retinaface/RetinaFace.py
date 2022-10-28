@@ -208,7 +208,7 @@ def extract_faces(img_path, threshold=0.9, model = None, align = True, allow_ups
                 mouth_right = landmarks["mouth_right"]
                 mouth_left = landmarks["mouth_left"]
 
-                facial_img = postprocess.alignment_procedure(facial_img, right_eye, left_eye, nose)
+                facial_img = postprocess.alignment_procedure(facial_img, left_eye, right_eye, nose)
 
             resp.append(facial_img[:, :, ::-1])
     #elif type(obj) == tuple:
