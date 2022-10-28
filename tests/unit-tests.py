@@ -36,12 +36,12 @@ for key in resp:
 plt.imshow(img[:, :, ::-1])
 plt.axis('off')
 plt.show()
-cv2.imwrite('outputs/'+img_path.split("/")[1], img)
+#cv2.imwrite('outputs/'+img_path.split("/")[1], img)
 
 #------------------------------
 #alignment
 
-img_paths = ["dataset/img11.jpg", "dataset/img4.jpg", "dataset/img5.jpg", "dataset/img6.jpg"]
+img_paths = ["dataset/img11.jpg", "dataset/img4.jpg", "dataset/img5.jpg", "dataset/img6.jpg", "dataset/img7.jpg", "dataset/img8.jpg"]
 
 for img_path in img_paths:
 
@@ -51,4 +51,4 @@ for img_path in img_paths:
         plt.imshow(img)
         plt.axis('off')
         plt.show()
-        cv2.imwrite('outputs/'+img_path.split("/")[1], img[:, :, ::-1])
+        #cv2.imwrite('outputs/'+img_path.split("/")[1], img[:, :, ::-1])
