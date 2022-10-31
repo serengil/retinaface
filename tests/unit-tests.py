@@ -38,7 +38,7 @@ for key in resp:
 plt.imshow(img[:, :, ::-1])
 plt.axis('off')
 plt.show()
-#cv2.imwrite('outputs/'+img_path.split("/")[1], img)
+cv2.imwrite('outputs/'+img_path.split("/")[1], img)
 
 #------------------------------
 #extract face with alignment
