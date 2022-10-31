@@ -74,6 +74,10 @@ def alignment_procedure(img, left_eye, right_eye, nose):
         img = Image.fromarray(img)
         img = np.array(img.rotate(direction * angle))
 
+        if left_eye[1] > nose[1] and right_eye[1] > nose[1]:
+           img = Image.fromarray(img)
+           img = np.array(img.rotate(180))
+
     #-----------------------
 
     return img #return img anyway
