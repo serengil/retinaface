@@ -223,4 +223,4 @@ def extract_faces(img_path, threshold=0.9, model=None, align=True, allow_upscali
             resp.append(facial_img[:, :, ::-1])
     # elif type(obj) == tuple:
 
-    return
+    return resp
