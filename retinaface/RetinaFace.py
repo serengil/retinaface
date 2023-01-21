@@ -56,9 +56,7 @@ def get_image(img_path):
     return img
 
 def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
-    """
-    TODO: add function doc here
-    """
+    resp = {}
 
     img = get_image(img_path)
 
@@ -141,9 +139,10 @@ def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
         sym_idx += 3
 
     proposals = np.vstack(proposals_list)
+    
     if proposals.shape[0]==0:
-        landmarks = np.zeros( (0,5,2) )
-        return np.zeros( (0,5) ), landmarks
+        return resp
+
     scores = np.vstack(scores_list)
     scores_ravel = scores.ravel()
     order = scores_ravel.argsort()[::-1]
@@ -163,7 +162,6 @@ def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
     det = det[keep, :]
     landmarks = landmarks[keep]
 
-    resp = {}
     for idx, face in enumerate(det):
 
         label = 'face_'+str(idx+1)
