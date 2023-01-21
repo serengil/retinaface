@@ -9,7 +9,7 @@
 [![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dserengil%26type%3Dpatrons&style=flat)](https://www.patreon.com/serengil?repo=retinaface)
 [![Twitter](https://img.shields.io/twitter/follow/serengil?color=blue&logo=twitter&style=flat)](https://twitter.com/serengil)
 
-
+[![DOI](http://img.shields.io/:DOI-10.1109/ASYU50717.2020.9259802-blue.svg?style=flat)](https://doi.org/10.1109/ASYU50717.2020.9259802)
 [![DOI](http://img.shields.io/:DOI-10.1109/ICEET53442.2021.9659697-blue.svg?style=flat)](https://doi.org/10.1109/ICEET53442.2021.9659697)
 
 </div>
@@ -19,7 +19,7 @@ RetinaFace is a deep learning based cutting-edge facial detector for Python comi
 RetinaFace is the face detection module of [insightface](https://github.com/deepinsight/insightface) project. The original implementation is mainly based on mxnet. Then, its tensorflow based [re-implementation](https://github.com/StanislasBertrand/RetinaFace-tf2) is published by [Stanislas Bertrand](https://github.com/StanislasBertrand). So, this repo is heavily inspired from the study of Stanislas Bertrand. Its source code is simplified and it is transformed to pip compatible but the main structure of the reference model and its pre-trained weights are same.
 
 <p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/img3.jpg" width="90%" height="90%">
-<br><em>Fenerbahce Women Volleyball Team</em>
+<br><em>The Yellow Angels - Fenerbahce Women's Volleyball Team</em>
 </p>
 
 ## Installation [![PyPI](https://img.shields.io/pypi/v/retina-face.svg)](https://pypi.org/project/retina-face/) [![Conda](https://img.shields.io/conda/vn/conda-forge/retina-face.svg)](https://anaconda.org/conda-forge/retina-face)
