@@ -8,6 +8,12 @@ img_path = "dataset/img3.jpg"
 img = cv2.imread(img_path)
 
 resp = RetinaFace.detect_faces(img_path, threshold = 0.1)
+
+img1 = cv2.cvtColor(cv2.imread("dataset/img1.jpg"), cv2.COLOR_BGR2RGB)
+img2 = cv2.cvtColor(cv2.imread("dataset/img3.jpg"), cv2.COLOR_BGR2RGB)
+batch_resp = RetinaFace.detect_batch_faces([img1, img2], threshold = 0.1)
+
+print ("Number of faces on img3.jpg equal: ", len(resp) == len(batch_resp[1]))
 #print(resp)
 
 def int_tuple(t):
