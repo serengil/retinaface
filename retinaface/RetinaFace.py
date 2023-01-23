@@ -1,3 +1,4 @@
+import math
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -180,7 +181,7 @@ def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
     return resp
 
 
-def detect_faces2(numpy_rgb_images, threshold=0.9, model=None):
+def detect_batch_faces(numpy_rgb_images, threshold=0.9, model=None):
     # ---------------------------
 
     if model is None:
@@ -209,95 +210,83 @@ def detect_faces2(numpy_rgb_images, threshold=0.9, model=None):
     batch_net_out = model(images)
     batch_net_out = [elt.numpy() for elt in batch_net_out]
     for i in range(batch_net_out[0].shape[0]):
-        net_out = [
-            batch_net_out[0][i:i+1],
-            batch_net_out[1][i:i+1],
-            batch_net_out[2][i:i+1],
-            batch_net_out[3][i:i+1],
-            batch_net_out[4][i:i+1],
-            batch_net_out[5][i:i+1],
-            batch_net_out[6][i:i+1],
-            batch_net_out[7][i:i+1],
-            batch_net_out[8][i:i+1]
-        ]
-
         proposals_list = []
         scores_list = []
         landmarks_list = []
-
         sym_idx = 0
-        for _idx, s in enumerate(_feat_stride_fpn):
-            _key = 'stride%s' % s
-            scores = net_out[sym_idx]
-            scores = scores[:, :, :, _num_anchors['stride%s' % s]:]
-
-            bbox_deltas = net_out[sym_idx + 1]
-            height, width = bbox_deltas.shape[1], bbox_deltas.shape[2]
-
+        for s in _feat_stride_fpn:
+            scores = batch_net_out[sym_idx][i:i+1]
             A = _num_anchors['stride%s' % s]
-            K = height * width
-            anchors_fpn = _anchors_fpn['stride%s' % s]
-            anchors = postprocess.anchors_plane(height, width, s, anchors_fpn)
-            anchors = anchors.reshape((K * A, 4))
-            scores = scores.reshape((-1, 1))
-
-            bbox_stds = [1.0, 1.0, 1.0, 1.0]
-            bbox_deltas = bbox_deltas
-            bbox_pred_len = bbox_deltas.shape[3] // A
-            bbox_deltas = bbox_deltas.reshape((-1, bbox_pred_len))
-            bbox_deltas[:, 0::4] = bbox_deltas[:, 0::4] * bbox_stds[0]
-            bbox_deltas[:, 1::4] = bbox_deltas[:, 1::4] * bbox_stds[1]
-            bbox_deltas[:, 2::4] = bbox_deltas[:, 2::4] * bbox_stds[2]
-            bbox_deltas[:, 3::4] = bbox_deltas[:, 3::4] * bbox_stds[3]
-            proposals = postprocess.bbox_pred(anchors, bbox_deltas)
-
-            proposals = postprocess.clip_boxes(proposals, numpy_rgb_images[i].shape[0:2]*np.array([img_scales[i]]))
-
-            if s == 4 and decay4 < 1.0:
-                scores *= decay4
-
+            scores = scores[:, :, :, A:]
             scores_ravel = scores.ravel()
             order = np.where(scores_ravel >= threshold)[0]
-            proposals = proposals[order, :]
-            scores = scores[order]
+            scores = scores_ravel[order]
 
-            proposals[:, 0:4] /= img_scales[i]
-            proposals_list.append(proposals)
-            scores_list.append(scores)
+            if scores.shape[0] == 0:
+                sym_idx += 3
+                continue
 
-            landmark_deltas = net_out[sym_idx + 2]
+            bbox_deltas = batch_net_out[sym_idx + 1][i:i+1]
+            height, width = bbox_deltas.shape[1], bbox_deltas.shape[2]
+            bbox_pred_len = bbox_deltas.shape[3] // A
+            bbox_deltas = bbox_deltas.reshape((-1, bbox_pred_len))
+
+            landmark_deltas = batch_net_out[sym_idx + 2][i:i+1]
             landmark_pred_len = landmark_deltas.shape[3] // A
             landmark_deltas = landmark_deltas.reshape((-1, 5, landmark_pred_len // 5))
-            landmarks = postprocess.landmark_pred(anchors, landmark_deltas)
-            landmarks = landmarks[order, :]
 
-            landmarks[:, :, 0:2] /= img_scales[i]
-            landmarks_list.append(landmarks)
+            anchors_fpn = _anchors_fpn['stride%s' % s]
+            proposals = []
+            landmarks = []
+            for index in order:
+                cell_y = index // (width * A)
+                cell_x = (index - cell_y * width * A) // A
+                n = index % A
+                anchor = np.array([cell_x, cell_y, cell_x, cell_y]) * s + anchors_fpn[n]
+                w = anchor[2] - anchor[0] + 1.0
+                h = anchor[3] - anchor[1] + 1.0
+                anchor_c = np.array([anchor[0] + 0.5 * (w - 1.0), anchor[1] + 0.5 * (h - 1.0)])
+                dx, dy, ln_dw, ln_dh = bbox_deltas[index]
+                pred_w = 0.5 * math.exp(ln_dw) * w
+                pred_h = 0.5 * math.exp(ln_dh) * h
+                pred_c = [anchor_c[0] + dx * w, anchor_c[1] + dy * h]
+                max_x = numpy_rgb_images[i].shape[1] * img_scales[i]
+                max_y = numpy_rgb_images[i].shape[0] * img_scales[i]
+                pred_box = np.array([max(0, pred_c[0] - pred_w), max(0, pred_c[1] - pred_h),
+                                     min(max_x, pred_c[0] + pred_w), min(max_y, pred_c[1] + pred_h)])
+                proposals.append(pred_box / img_scales[i])
+
+                landmark = landmark_deltas[index]
+                for l in range(5):
+                    landmark[l, 0] = landmark[l, 0] * w + anchor_c[0]
+                    landmark[l, 1] = landmark[l, 1] * h + anchor_c[1]
+                landmarks.append(landmark / img_scales[i])
+
+            proposals_list.append(np.array(proposals))
+            scores_list.append(scores)
+            landmarks_list.append(np.array(landmarks))
             sym_idx += 3
 
-        proposals = np.vstack(proposals_list)
-
-        if proposals.shape[0] == 0:
+        if len(scores_list) == 0:
             batch_resp.append({})
             continue
 
-        scores = np.vstack(scores_list)
+        scores = np.hstack(scores_list)
         scores_ravel = scores.ravel()
         order = scores_ravel.argsort()[::-1]
 
+        proposals = np.vstack(proposals_list)
         proposals = proposals[order, :]
         scores = scores[order]
         landmarks = np.vstack(landmarks_list)
-        landmarks = landmarks[order].astype(np.float32, copy=False)
+        landmarks = landmarks[order].astype(np.float32)
 
-        pre_det = np.hstack((proposals[:, 0:4], scores)).astype(np.float32, copy=False)
+        pre_det = np.hstack((proposals, scores.reshape(-1,1))).astype(np.float32, copy=False)
 
         # nms = cpu_nms_wrapper(nms_threshold)
         # keep = nms(pre_det)
         keep = postprocess.cpu_nms(pre_det, nms_threshold)
-
-        det = np.hstack((pre_det, proposals[:, 4:]))
-        det = det[keep, :]
+        det = pre_det[keep, :]
         landmarks = landmarks[keep]
 
         resp = {}
