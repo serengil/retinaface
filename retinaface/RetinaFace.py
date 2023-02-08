@@ -9,6 +9,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import numpy as np
 import tensorflow as tf
 import cv2
+from urllib.request import urlopen
 
 from retinaface.model import retinaface_model
 from retinaface.commons import preprocess, postprocess
@@ -39,8 +40,13 @@ def build_model():
 
 def get_image(img_path):
     if type(img_path) == str:  # Load from file path
-        if not os.path.isfile(img_path):
-            raise ValueError("Input image file path (", img_path, ") does not exist.")
+        try:
+            req = urlopen(name)
+            img = np.asarray(bytearray(req.read()), dtype=np.uint8)
+            img = cv2.imdecode(image, -1)
+        except:
+            if not os.path.isfile(img_path):
+                raise ValueError("Input image file path (", img_path, ") does not exist.")
         img = cv2.imread(img_path)
 
     elif isinstance(img_path, np.ndarray):  # Use given NumPy array
