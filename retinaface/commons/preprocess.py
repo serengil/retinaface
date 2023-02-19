@@ -42,7 +42,7 @@ def preprocess_batch_images(batch_images):
         scale_x = scales[0] / img_w
         scale_y = scales[1] / img_h
         scale = scale_x
-        if scale_y<scale_x<1 or 1<scale_y<scale_x or scale_y<1<scale_x:
+        if scale_y<scale_x<=1 or 1<=scale_y<scale_x or scale_y<=1<=scale_x:
             scale = scale_y
 
         image = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_LINEAR)
