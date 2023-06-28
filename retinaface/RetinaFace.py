@@ -16,6 +16,10 @@ from retinaface.commons import preprocess, postprocess
 #---------------------------
 
 import tensorflow as tf
+
+#Limit the amount of reserved VRAM so that other scripts can be run in the same GPU as well
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true' 
+
 tf_version = int(tf.__version__.split(".")[0])
 
 if tf_version == 2:
