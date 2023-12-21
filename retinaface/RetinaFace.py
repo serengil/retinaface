@@ -26,20 +26,22 @@ if tf_version == 2:
     import logging
     tf.get_logger().setLevel(logging.ERROR)
 
-#---------------------------
+# ---------------------------
+
 
 def build_model():
-    
-    global model #singleton design pattern
-    
+
+    global model  # singleton design pattern
+
     if not "model" in globals():
-        
+
         model = tf.function(
             retinaface_model.build_model(),
             input_signature=(tf.TensorSpec(shape=[None, None, None, 3], dtype=np.float32),)
         )
 
     return model
+
 
 def get_image(img_path):
     if type(img_path) == str:  # Load from file path
@@ -59,31 +61,31 @@ def get_image(img_path):
 
     return img
 
-def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
+def detect_faces(img_path, threshold=0.9, model=None, allow_upscaling=True):
     resp = {}
-
     img = get_image(img_path)
 
-    #---------------------------
+    # ---------------------------
 
     if model is None:
         model = build_model()
 
-    #---------------------------
+    # ---------------------------
 
-    nms_threshold = 0.4; decay4=0.5
+    nms_threshold = 0.4
+    decay4 = 0.5
 
     _feat_stride_fpn = [32, 16, 8]
 
     _anchors_fpn = {
         'stride32': np.array([[-248., -248.,  263.,  263.], [-120., -120.,  135.,  135.]], dtype=np.float32),
         'stride16': np.array([[-56., -56.,  71.,  71.], [-24., -24.,  39.,  39.]], dtype=np.float32),
-        'stride8': np.array([[-8., -8., 23., 23.], [ 0.,  0., 15., 15.]], dtype=np.float32)
+        'stride8': np.array([[-8., -8., 23., 23.], [0.,  0., 15., 15.]], dtype=np.float32)
     }
 
     _num_anchors = {'stride32': 2, 'stride16': 2, 'stride8': 2}
 
-    #---------------------------
+    # ---------------------------
 
     proposals_list = []
     scores_list = []
@@ -94,16 +96,16 @@ def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
     sym_idx = 0
 
     for _idx, s in enumerate(_feat_stride_fpn):
-        _key = 'stride%s'%s
+        _key = 'stride%s' % s
         scores = net_out[sym_idx]
-        scores = scores[:, :, :, _num_anchors['stride%s'%s]:]
+        scores = scores[:, :, :, _num_anchors['stride%s' % s]:]
 
         bbox_deltas = net_out[sym_idx + 1]
         height, width = bbox_deltas.shape[1], bbox_deltas.shape[2]
 
-        A = _num_anchors['stride%s'%s]
+        A = _num_anchors['stride%s' % s]
         K = height * width
-        anchors_fpn = _anchors_fpn['stride%s'%s]
+        anchors_fpn = _anchors_fpn['stride%s' % s]
         anchors = postprocess.anchors_plane(height, width, s, anchors_fpn)
         anchors = anchors.reshape((K * A, 4))
         scores = scores.reshape((-1, 1))
@@ -112,19 +114,19 @@ def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
         bbox_deltas = bbox_deltas
         bbox_pred_len = bbox_deltas.shape[3]//A
         bbox_deltas = bbox_deltas.reshape((-1, bbox_pred_len))
-        bbox_deltas[:, 0::4] = bbox_deltas[:,0::4] * bbox_stds[0]
-        bbox_deltas[:, 1::4] = bbox_deltas[:,1::4] * bbox_stds[1]
-        bbox_deltas[:, 2::4] = bbox_deltas[:,2::4] * bbox_stds[2]
-        bbox_deltas[:, 3::4] = bbox_deltas[:,3::4] * bbox_stds[3]
+        bbox_deltas[:, 0::4] = bbox_deltas[:, 0::4] * bbox_stds[0]
+        bbox_deltas[:, 1::4] = bbox_deltas[:, 1::4] * bbox_stds[1]
+        bbox_deltas[:, 2::4] = bbox_deltas[:, 2::4] * bbox_stds[2]
+        bbox_deltas[:, 3::4] = bbox_deltas[:, 3::4] * bbox_stds[3]
         proposals = postprocess.bbox_pred(anchors, bbox_deltas)
 
         proposals = postprocess.clip_boxes(proposals, im_info[:2])
 
-        if s==4 and decay4<1.0:
+        if s == 4 and decay4 < 1.0:
             scores *= decay4
 
         scores_ravel = scores.ravel()
-        order = np.where(scores_ravel>=threshold)[0]
+        order = np.where(scores_ravel >= threshold)[0]
         proposals = proposals[order, :]
         scores = scores[order]
 
@@ -156,13 +158,13 @@ def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
     landmarks = np.vstack(landmarks_list)
     landmarks = landmarks[order].astype(np.float32, copy=False)
 
-    pre_det = np.hstack((proposals[:,0:4], scores)).astype(np.float32, copy=False)
+    pre_det = np.hstack((proposals[:, 0:4], scores)).astype(np.float32, copy=False)
 
     #nms = cpu_nms_wrapper(nms_threshold)
     #keep = nms(pre_det)
     keep = postprocess.cpu_nms(pre_det, nms_threshold)
 
-    det = np.hstack( (pre_det, proposals[:,4:]) )
+    det = np.hstack((pre_det, proposals[:, 4:]))
     det = det[keep, :]
     landmarks = landmarks[keep]
 
@@ -183,24 +185,30 @@ def detect_faces(img_path, threshold=0.9, model = None, allow_upscaling = True):
 
     return resp
 
-def extract_faces(img_path, threshold=0.9, model = None, align = True, allow_upscaling = True):
+
+def extract_faces(img_path, threshold=0.9, model=None, align=True, allow_upscaling=True, expand_face_area: int = 0):
 
     resp = []
 
-    #---------------------------
+    # ---------------------------
 
     img = get_image(img_path)
 
-    #---------------------------
+    # ---------------------------
 
-    obj = detect_faces(img_path = img, threshold = threshold, model = model, allow_upscaling = allow_upscaling)
+    obj = detect_faces(img_path=img, threshold=threshold, model=model, allow_upscaling=allow_upscaling)
 
     if type(obj) == dict:
         for key in obj:
             identity = obj[key]
 
             facial_area = identity["facial_area"]
-            facial_img = img[facial_area[1]: facial_area[3], facial_area[0]: facial_area[2]]
+            # expand the facial area to be extracted and stay within img.shape limits
+            x1 = max(0, facial_area[0] - expand_face_area)  # expand left
+            y1 = max(0, facial_area[1] - expand_face_area)  # expand top
+            x2 = min(img.shape[1], facial_area[2] + expand_face_area)  # expand right
+            y2 = min(img.shape[0], facial_area[3] + expand_face_area)  # expand bottom
+            facial_img = img[y1: y2, x1: x2]
 
             if align == True:
                 landmarks = identity["landmarks"]
@@ -213,6 +221,6 @@ def extract_faces(img_path, threshold=0.9, model = None, align = True, allow_ups
                 facial_img = postprocess.alignment_procedure(facial_img, right_eye, left_eye, nose)
 
             resp.append(facial_img[:, :, ::-1])
-    #elif type(obj) == tuple:
+    # elif type(obj) == tuple:
 
     return resp
