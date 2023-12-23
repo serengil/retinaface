@@ -1,0 +1,5 @@
+numpy>=1.14.0
+gdown>=3.10.1
+Pillow>=5.2.0
+opencv-python>=3.4.4
+tensorflow>=1.9.0
