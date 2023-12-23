@@ -54,12 +54,15 @@ def test_analyze_crowded_photo():
         plt.show()
         cv2.imwrite("outputs/" + img_path.split("/")[1], img)
 
+    logger.info("✅ Crowded photo analysis test done")
+
 
 def test_alignment_for_inverse_clock_way():
     # img11.jpg is required to rotate inverse direction of clock
     img_path = "tests/dataset/img11.jpg"
     img = cv2.imread(img_path)
     do_alignment_checks(img, expected_faces=1)
+    logger.info("✅ Alignment for inverse clock way test done")
 
 
 def test_alignment_for_clock_way():
@@ -68,6 +71,7 @@ def test_alignment_for_clock_way():
     img = cv2.imread(img_path)
     mirror_img = cv2.flip(img, 1)
     do_alignment_checks(mirror_img, expected_faces=1)
+    logger.info("✅ Alignment for clock way test done")
 
 
 def do_alignment_checks(img: np.ndarray, expected_faces: int) -> None:
