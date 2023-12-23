@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 from retinaface import RetinaFace
@@ -7,6 +6,9 @@ from retinaface.commons.logger import Logger
 logger = Logger("tests/test_actions.py")
 
 do_plotting = False
+
+if do_plotting is True:
+    import matplotlib.pyplot as plt
 
 
 def int_tuple(t):
