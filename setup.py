@@ -3,8 +3,11 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+with open("requirements.txt", "r", encoding="utf-8") as f:
+    requirements = f.read().split("\n")
+
 setuptools.setup(
-    name="retina-face", #pip install retina-face
+    name="retina-face",  # pip install retina-face
     version="0.0.14",
     author="Sefik Ilkin Serengil",
     author_email="serengil@gmail.com",
@@ -16,8 +19,8 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent"
+        "Operating System :: OS Independent",
     ],
-    python_requires='>=3.5.5',
-    install_requires=["numpy>=1.14.0", "gdown>=3.10.1", "Pillow>=5.2.0", "opencv-python>=3.4.4", "tensorflow>=1.9.0"]
+    python_requires=">=3.5.5",
+    install_requires=requirements,
 )
