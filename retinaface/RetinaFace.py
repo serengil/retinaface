@@ -8,6 +8,9 @@ import tensorflow as tf
 
 from retinaface.model import retinaface_model
 from retinaface.commons import preprocess, postprocess
+from retinaface.commons.logger import Logger
+
+logger = Logger(module="retinaface/RetinaFace.py")
 
 # pylint: disable=global-variable-undefined, no-name-in-module, unused-import, too-many-locals, redefined-outer-name, too-many-statements, too-many-arguments
 
@@ -208,6 +211,7 @@ def extract_faces(
     align: bool = True,
     allow_upscaling: bool = True,
     expand_face_area: int = 0,
+    align_first: bool = False,
 ) -> list:
     """
     Extract detected and aligned faces
@@ -216,8 +220,10 @@ def extract_faces(
         threshold (float): detection threshold
         model (Model): pre-trained model can be passed to the function
         align (bool): enable or disable alignment
-        allow_upscaling (bool)
-        expand_face_area (int): set this to something to expand facial area with given pixels
+        allow_upscaling (bool): allowing up-scaling
+        expand_face_area (int): expand detected facial area with a percentage
+        align_first (bool): set this True to align first and detect second
+            this can be applied only if input image has just one face
     """
     resp = []
 
@@ -231,16 +237,31 @@ def extract_faces(
         img_path=img, threshold=threshold, model=model, allow_upscaling=allow_upscaling
     )
 
+    if align_first is True and len(obj) > 1:
+        logger.warn(
+            f"Even though align_first is set to True, there are {len(obj)} faces in input image."
+            "Align first functionality can be applied only if there is single face in the input"
+        )
+
     if isinstance(obj, dict):
         for _, identity in obj.items():
             facial_area = identity["facial_area"]
 
+            x = facial_area[0]
+            y = facial_area[1]
+            w = facial_area[2]
+            h = facial_area[3]
+
             # expand the facial area to be extracted and stay within img.shape limits
-            x1 = max(0, facial_area[0] - expand_face_area)  # expand left
-            y1 = max(0, facial_area[1] - expand_face_area)  # expand top
-            x2 = min(img.shape[1], facial_area[2] + expand_face_area)  # expand right
-            y2 = min(img.shape[0], facial_area[3] + expand_face_area)  # expand bottom
-            facial_img = img[y1:y2, x1:x2]
+            x1 = max(0, x - int((w * expand_face_area) / 100))  # expand left
+            y1 = max(0, y - int((h * expand_face_area) / 100))  # expand top
+            x2 = min(img.shape[1], w + int((w * expand_face_area) / 100))  # expand right
+            y2 = min(img.shape[0], h + int((h * expand_face_area) / 100))  # expand bottom
+
+            if align_first is False or (align_first is True and len(obj) > 1):
+                facial_img = img[y1:y2, x1:x2]
+            else:
+                facial_img = img.copy()
 
             if align is True:
                 landmarks = identity["landmarks"]
@@ -249,8 +270,18 @@ def extract_faces(
                 nose = landmarks["nose"]
                 # mouth_right = landmarks["mouth_right"]
                 # mouth_left = landmarks["mouth_left"]
-
                 facial_img = postprocess.alignment_procedure(facial_img, right_eye, left_eye, nose)
+
+            if align_first is True and len(obj) == 1:
+                facial_img = extract_faces(
+                    img_path=facial_img,
+                    threshold=threshold,
+                    model=model,
+                    allow_upscaling=allow_upscaling,
+                    expand_face_area=expand_face_area,
+                    align=False,
+                    align_first=False,
+                )[0][:, :, ::-1]
 
             resp.append(facial_img[:, :, ::-1])
 

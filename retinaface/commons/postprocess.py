@@ -1,4 +1,5 @@
 import math
+from typing import Union
 import numpy as np
 from PIL import Image
 
@@ -7,16 +8,22 @@ from PIL import Image
 
 
 def findEuclideanDistance(
-    source_representation: np.ndarray, test_representation: np.ndarray
+    source_representation: Union[np.ndarray, list], test_representation: Union[np.ndarray, list]
 ) -> float:
     """
     Find euclidean distance between 2 vectors
     Args:
-        source_representation (numpy array)
-        test_representation (numpy array)
+        source_representation (numpy array or list)
+        test_representation (numpy array or list)
     Returns
         distance
     """
+    if isinstance(source_representation, list):
+        source_representation = np.array(source_representation)
+
+    if isinstance(test_representation, list):
+        test_representation = np.array(test_representation)
+
     euclidean_distance = source_representation - test_representation
     euclidean_distance = np.sum(np.multiply(euclidean_distance, euclidean_distance))
     euclidean_distance = np.sqrt(euclidean_distance)
