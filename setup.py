@@ -12,6 +12,7 @@ setuptools.setup(
     author="Sefik Ilkin Serengil",
     author_email="serengil@gmail.com",
     description="RetinaFace: Deep Face Detection Framework in TensorFlow for Python",
+    data_files=[("", ["README.md", "requirements.txt"])],
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/serengil/retinaface",
