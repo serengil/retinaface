@@ -271,18 +271,20 @@ def extract_faces(
                 # mouth_right = landmarks["mouth_right"]
                 # mouth_left = landmarks["mouth_left"]
                 facial_img, rotate_angle, rotate_direction = postprocess.alignment_procedure(
-                                                                facial_img, right_eye, left_eye, nose
+                                                            facial_img, right_eye, left_eye, nose
                                                             )
 
             if align_first is True and len(obj) == 1:
                 facial_area = rotate_facial_area(
                     facial_area, rotate_angle, rotate_direction, img.shape
                     )
-                # expand the facial area to be extracted and stay within img.shape limits
+                # Expand the facial area to be extracted and stay within img.shape limits
                 x1 = max(0, facial_area[0] - int((facial_area[2] * expand_face_area) / 100))
                 y1 = max(0, facial_area[1] - int((facial_area[3] * expand_face_area) / 100))
-                x2 = min(img.shape[1], facial_area[2] + int((facial_area[2] * expand_face_area) / 100))
-                y2 = min(img.shape[0], facial_area[3] + int((facial_area[3] * expand_face_area) / 100))
+                x2 = min(img.shape[1], facial_area[2] + 
+                         int((facial_area[2] * expand_face_area) / 100))
+                y2 = min(img.shape[0], facial_area[3] + 
+                         int((facial_area[3] * expand_face_area) / 100))
                 facial_img = facial_img[y1:y2, x1:x2]
 
             resp.append(facial_img[:, :, ::-1])
@@ -295,7 +297,7 @@ def rotate_facial_area(facial_area: Tuple[int, int, int, int], angle: float, dir
     Rotate the facial area around its center.
 
     Args:
-        facial_area (tuple of int): Representing the coordinates (x1, y1, x2, y2) of the facial area.
+        facial_area (tuple of int): Representing the (x1, y1, x2, y2) of the facial area.
         angle (float): Angle of rotation in degrees.
         direction (int): Direction of rotation (-1 for clockwise, 1 for counterclockwise).
         size (tuple of int): Tuple representing the size of the image (width, height).
