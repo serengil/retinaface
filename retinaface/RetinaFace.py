@@ -274,8 +274,13 @@ def extract_faces(
 
             if align_first is True and len(obj) == 1:
                 facial_area = rotateFacialArea(facial_area, rotate_angle, rotation_direction, img.shape)
-                facial_img = facial_img[facial_area[1]:facial_area[3], facial_area[0]:facial_area[2]]
-            
+                # expand the facial area to be extracted and stay within img.shape limits
+                x1 = max(0, facial_area[0] - int((facial_area[2] * expand_face_area) / 100))
+                y1 = max(0, facial_area[1] - int((facial_area[3] * expand_face_area) / 100))
+                x2 = min(img.shape[1], facial_area[2] + int((facial_area[2] * expand_face_area) / 100))
+                y2 = min(img.shape[0], facial_area[3] + int((facial_area[3] * expand_face_area) / 100))
+                facial_img = facial_img[y1:y2, x1:x2]
+                
             resp.append(facial_img[:, :, ::-1])
 
     return resp
