@@ -6,6 +6,7 @@ from typing import Union, Any, Optional, Dict
 import numpy as np
 import tensorflow as tf
 
+from retinaface import __version__
 from retinaface.model import retinaface_model
 from retinaface.commons import preprocess, postprocess
 from retinaface.commons.logger import Logger
