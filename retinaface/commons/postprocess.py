@@ -88,7 +88,7 @@ def alignment_procedure(img: np.ndarray, left_eye: tuple, right_eye: tuple, nose
 
     # -----------------------
 
-    return img
+    return img, angle, direction
 
 
 def bbox_pred(boxes, box_deltas):
