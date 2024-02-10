@@ -1,7 +1,7 @@
 import os
 import warnings
 import logging
-from typing import Union, Any, Optional, Dict, Tuple
+from typing import Union, Any, Optional, Dict
 
 import numpy as np
 import tensorflow as tf
@@ -243,89 +243,52 @@ def extract_faces(
             "Align first functionality can be applied only if there is single face in the input"
         )
 
-    if isinstance(obj, dict):
-        for _, identity in obj.items():
-            facial_area = identity["facial_area"]
+    if not isinstance(obj, dict):
+        return resp
 
-            x = facial_area[0]
-            y = facial_area[1]
-            w = facial_area[2]
-            h = facial_area[3]
+    for _, identity in obj.items():
+        facial_area = identity["facial_area"]
+        rotate_angle = 0
+        rotate_direction = 1
 
-            # expand the facial area to be extracted and stay within img.shape limits
-            x1 = max(0, x - int((w * expand_face_area) / 100))  # expand left
-            y1 = max(0, y - int((h * expand_face_area) / 100))  # expand top
-            x2 = min(img.shape[1], w + int((w * expand_face_area) / 100))  # expand right
-            y2 = min(img.shape[0], h + int((h * expand_face_area) / 100))  # expand bottom
+        x = facial_area[0]
+        y = facial_area[1]
+        w = facial_area[2]
+        h = facial_area[3]
 
-            if align_first is False or (align_first is True and len(obj) > 1):
-                facial_img = img[y1:y2, x1:x2]
-            else:
-                facial_img = img.copy()
+        # expand the facial area to be extracted and stay within img.shape limits
+        x1 = max(0, x - int((w * expand_face_area) / 100))  # expand left
+        y1 = max(0, y - int((h * expand_face_area) / 100))  # expand top
+        x2 = min(img.shape[1], w + int((w * expand_face_area) / 100))  # expand right
+        y2 = min(img.shape[0], h + int((h * expand_face_area) / 100))  # expand bottom
 
-            if align is True:
-                landmarks = identity["landmarks"]
-                left_eye = landmarks["left_eye"]
-                right_eye = landmarks["right_eye"]
-                nose = landmarks["nose"]
-                # mouth_right = landmarks["mouth_right"]
-                # mouth_left = landmarks["mouth_left"]
-                facial_img, rotate_angle, rotate_direction = postprocess.alignment_procedure(
-                                                            facial_img, right_eye, left_eye, nose
-                                                            )
+        if align_first is False or (align_first is True and len(obj) > 1):
+            facial_img = img[y1:y2, x1:x2]
+        else:
+            facial_img = img.copy()
 
-            if align_first is True and len(obj) == 1:
-                facial_area = rotate_facial_area(
-                    facial_area, rotate_angle, rotate_direction, img.shape
-                    )
-                # Expand the facial area to be extracted and stay within img.shape limits
-                x1 = max(0, facial_area[0] - int((facial_area[2] * expand_face_area) / 100))
-                y1 = max(0, facial_area[1] - int((facial_area[3] * expand_face_area) / 100))
-                x2 = min(
-                    img.shape[1], facial_area[2] + int((facial_area[2] * expand_face_area) / 100)
-                )
-                y2 = min(
-                    img.shape[0], facial_area[3] + int((facial_area[3] * expand_face_area) / 100)
-                )
-                facial_img = facial_img[y1:y2, x1:x2]
+        if align is True:
+            landmarks = identity["landmarks"]
+            left_eye = landmarks["left_eye"]
+            right_eye = landmarks["right_eye"]
+            nose = landmarks["nose"]
+            # mouth_right = landmarks["mouth_right"]
+            # mouth_left = landmarks["mouth_left"]
+            facial_img, rotate_angle, rotate_direction = postprocess.alignment_procedure(
+                facial_img, right_eye, left_eye, nose
+            )
 
-            resp.append(facial_img[:, :, ::-1])
+        if align_first is True and len(obj) == 1:
+            facial_area = postprocess.rotate_facial_area(
+                facial_area, rotate_angle, rotate_direction, img.shape
+            )
+            # Expand the facial area to be extracted and stay within img.shape limits
+            x1 = max(0, facial_area[0] - int((facial_area[2] * expand_face_area) / 100))
+            y1 = max(0, facial_area[1] - int((facial_area[3] * expand_face_area) / 100))
+            x2 = min(img.shape[1], facial_area[2] + int((facial_area[2] * expand_face_area) / 100))
+            y2 = min(img.shape[0], facial_area[3] + int((facial_area[3] * expand_face_area) / 100))
+            facial_img = facial_img[y1:y2, x1:x2]
+
+        resp.append(facial_img[:, :, ::-1])
 
     return resp
-
-def rotate_facial_area(facial_area: Tuple[int, int, int, int], angle: float, direction:
-                        int, size: Tuple[int, int]) -> Tuple[int, int, int, int]:
-    """
-    Rotate the facial area around its center.
-
-    Args:
-        facial_area (tuple of int): Representing the (x1, y1, x2, y2) of the facial area.
-        angle (float): Angle of rotation in degrees.
-        direction (int): Direction of rotation (-1 for clockwise, 1 for counterclockwise).
-        size (tuple of int): Tuple representing the size of the image (width, height).
-
-    Returns:
-        tuple of int: Representing the new coordinates (x1, y1, x2, y2) of the rotated facial area.
-    """
-    # Angle in radians
-    angle = angle * np.pi / 180
-
-    # Translate the facial area to the center of the image
-    x = (facial_area[0] + facial_area[2]) / 2 - size[1] / 2
-    y = (facial_area[1] + facial_area[3]) / 2 - size[0] / 2
-
-    # Rotate the facial area
-    x_new = x * np.cos(angle) + y * direction * np.sin(angle)
-    y_new = -x * direction * np.sin(angle) + y * np.cos(angle)
-
-    # Translate the facial area back to the original position
-    x_new = x_new + size[1] / 2
-    y_new = y_new + size[0] / 2
-
-    # Calculate the new facial area
-    x1 = x_new - (facial_area[2] - facial_area[0]) / 2
-    y1 = y_new - (facial_area[3] - facial_area[1]) / 2
-    x2 = x_new + (facial_area[2] - facial_area[0]) / 2
-    y2 = y_new + (facial_area[3] - facial_area[1]) / 2
-
-    return (int(x1), int(y1), int(x2), int(y2))

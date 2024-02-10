@@ -25,8 +25,8 @@ def test_expand_face_area():
     landmarks1 = obj1["face_1"]["landmarks"]
     landmarks2 = obj2["face_1"]["landmarks"]
 
-    distance1 = postprocess.findEuclideanDistance(landmarks1["right_eye"], landmarks1["left_eye"])
-    distance2 = postprocess.findEuclideanDistance(landmarks2["right_eye"], landmarks2["left_eye"])
+    distance1 = postprocess.find_euclidean_distance(landmarks1["right_eye"], landmarks1["left_eye"])
+    distance2 = postprocess.find_euclidean_distance(landmarks2["right_eye"], landmarks2["left_eye"])
 
     # 2nd one's expand ratio is higher. so, it should be smaller.
     assert distance2 < distance1

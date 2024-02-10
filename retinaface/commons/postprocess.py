@@ -1,5 +1,5 @@
 import math
-from typing import Union
+from typing import Union, Tuple
 import numpy as np
 from PIL import Image
 
@@ -7,7 +7,7 @@ from PIL import Image
 # pylint: disable=unused-argument
 
 
-def findEuclideanDistance(
+def find_euclidean_distance(
     source_representation: Union[np.ndarray, list], test_representation: Union[np.ndarray, list]
 ) -> float:
     """
@@ -30,7 +30,9 @@ def findEuclideanDistance(
     return euclidean_distance
 
 
-def alignment_procedure(img: np.ndarray, left_eye: tuple, right_eye: tuple, nose: tuple):
+def alignment_procedure(
+    img: np.ndarray, left_eye: tuple, right_eye: tuple, nose: tuple
+) -> Tuple[np.ndarray, float, int]:
     """
     Alignma given face with respect to the left and right eye coordinates.
     Left eye is the eye appearing on the left (right eye of the person). Left top point is (0, 0)
@@ -58,9 +60,9 @@ def alignment_procedure(img: np.ndarray, left_eye: tuple, right_eye: tuple, nose
     # -----------------------
     # find length of triangle edges
 
-    a = findEuclideanDistance(np.array(left_eye), np.array(point_3rd))
-    b = findEuclideanDistance(np.array(right_eye), np.array(point_3rd))
-    c = findEuclideanDistance(np.array(right_eye), np.array(left_eye))
+    a = find_euclidean_distance(np.array(left_eye), np.array(point_3rd))
+    b = find_euclidean_distance(np.array(right_eye), np.array(point_3rd))
+    c = find_euclidean_distance(np.array(right_eye), np.array(left_eye))
 
     # -----------------------
     # apply cosine rule
@@ -89,6 +91,46 @@ def alignment_procedure(img: np.ndarray, left_eye: tuple, right_eye: tuple, nose
     # -----------------------
 
     return img, angle, direction
+
+
+def rotate_facial_area(
+    facial_area: Tuple[int, int, int, int], angle: float, direction: int, size: Tuple[int, int]
+) -> Tuple[int, int, int, int]:
+    """
+    Rotate the facial area around its center.
+
+    Args:
+        facial_area (tuple of int): Representing the (x1, y1, x2, y2) of the facial area.
+        angle (float): Angle of rotation in degrees.
+        direction (int): Direction of rotation (-1 for clockwise, 1 for counterclockwise).
+        size (tuple of int): Tuple representing the size of the image (width, height).
+
+    Returns:
+        rotated_facial_area (tuple of int): Representing the new coordinates
+            (x1, y1, x2, y2) of the rotated facial area.
+    """
+    # Angle in radians
+    angle = angle * np.pi / 180
+
+    # Translate the facial area to the center of the image
+    x = (facial_area[0] + facial_area[2]) / 2 - size[1] / 2
+    y = (facial_area[1] + facial_area[3]) / 2 - size[0] / 2
+
+    # Rotate the facial area
+    x_new = x * np.cos(angle) + y * direction * np.sin(angle)
+    y_new = -x * direction * np.sin(angle) + y * np.cos(angle)
+
+    # Translate the facial area back to the original position
+    x_new = x_new + size[1] / 2
+    y_new = y_new + size[0] / 2
+
+    # Calculate the new facial area
+    x1 = x_new - (facial_area[2] - facial_area[0]) / 2
+    y1 = y_new - (facial_area[3] - facial_area[1]) / 2
+    x2 = x_new + (facial_area[2] - facial_area[0]) / 2
+    y2 = y_new + (facial_area[3] - facial_area[1]) / 2
+
+    return (int(x1), int(y1), int(x2), int(y2))
 
 
 def bbox_pred(boxes, box_deltas):
