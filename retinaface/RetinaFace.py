@@ -1,7 +1,7 @@
 import os
 import warnings
 import logging
-from typing import Union, Any, Optional, Dict
+from typing import Union, Any, Optional, Dict, Tuple
 
 import numpy as np
 import tensorflow as tf
@@ -273,7 +273,7 @@ def extract_faces(
                 facial_img, rotate_angle, rotation_direction = postprocess.alignment_procedure(facial_img, right_eye, left_eye, nose)
 
             if align_first is True and len(obj) == 1:
-                facial_area = rotateFacialArea(facial_area, rotate_angle, rotation_direction, img.shape)
+                facial_area = rotate_facial_area(facial_area, rotate_angle, rotation_direction, img.shape)
                 # expand the facial area to be extracted and stay within img.shape limits
                 x1 = max(0, facial_area[0] - int((facial_area[2] * expand_face_area) / 100))
                 y1 = max(0, facial_area[1] - int((facial_area[3] * expand_face_area) / 100))
@@ -285,26 +285,38 @@ def extract_faces(
 
     return resp
 
-def rotateFacialArea(facialArea, angle, direction, size):
+def rotate_facial_area(facial_area: Tuple[int, int, int, int], angle: float, direction: int, size: Tuple[int, int]) -> Tuple[int, int, int, int]:
+    """
+    Rotate the facial area around its center.
+    
+    Args:
+        facial_area (tuple of int): Tuple representing the coordinates (x1, y1, x2, y2) of the facial area.
+        angle (float): Angle of rotation in degrees.
+        direction (int): Direction of rotation (-1 for clockwise, 1 for counterclockwise).
+        size (tuple of int): Tuple representing the size of the image (width, height).
+        
+    Returns:
+        tuple of int: Tuple representing the new coordinates (x1, y1, x2, y2) of the rotated facial area.
+    """
     # Angle in radians
     angle = angle * np.pi / 180
 
     # Translate the facial area to the center of the image
-    x = (facialArea[0] + facialArea[2]) / 2 - size[1] / 2
-    y = (facialArea[1] + facialArea[3]) / 2 - size[0] / 2
+    x = (facial_area[0] + facial_area[2]) / 2 - size[1] / 2
+    y = (facial_area[1] + facial_area[3]) / 2 - size[0] / 2
 
     # Rotate the facial area
-    xNew = x * np.cos(angle) + y * direction * np.sin(angle)
-    yNew = -x * direction * np.sin(angle) + y * np.cos(angle)
+    x_new = x * np.cos(angle) + y * direction * np.sin(angle)
+    y_new = -x * direction * np.sin(angle) + y * np.cos(angle)
     
     # Translate the facial area back to the original position
-    xNew = xNew + size[1] / 2
-    yNew = yNew + size[0] / 2
+    x_new = x_new + size[1] / 2
+    y_new = y_new + size[0] / 2
     
     # Calculate the new facial area
-    x1 = xNew - (facialArea[2] - facialArea[0]) / 2
-    y1 = yNew - (facialArea[3] - facialArea[1]) / 2
-    x2 = xNew + (facialArea[2] - facialArea[0]) / 2
-    y2 = yNew + (facialArea[3] - facialArea[1]) / 2
+    x1 = x_new - (facial_area[2] - facial_area[0]) / 2
+    y1 = y_new - (facial_area[3] - facial_area[1]) / 2
+    x2 = x_new + (facial_area[2] - facial_area[0]) / 2
+    y2 = y_new + (facial_area[3] - facial_area[1]) / 2
 
     return (int(x1), int(y1), int(x2), int(y2))
