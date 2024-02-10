@@ -270,19 +270,36 @@ def extract_faces(
                 nose = landmarks["nose"]
                 # mouth_right = landmarks["mouth_right"]
                 # mouth_left = landmarks["mouth_left"]
-                facial_img = postprocess.alignment_procedure(facial_img, right_eye, left_eye, nose)
+                facial_img, rotate_angle, rotation_direction = postprocess.alignment_procedure(facial_img, right_eye, left_eye, nose)
 
             if align_first is True and len(obj) == 1:
-                facial_img = extract_faces(
-                    img_path=facial_img,
-                    threshold=threshold,
-                    model=model,
-                    allow_upscaling=allow_upscaling,
-                    expand_face_area=expand_face_area,
-                    align=False,
-                    align_first=False,
-                )[0][:, :, ::-1]
-
+                facial_area = rotateFacialArea(facial_area, rotate_angle, rotation_direction, img.shape)
+                facial_img = facial_img[facial_area[1]:facial_area[3], facial_area[0]:facial_area[2]]
+            
             resp.append(facial_img[:, :, ::-1])
 
     return resp
+
+def rotateFacialArea(facialArea, angle, direction, size):
+    # Angle in radians
+    angle = angle * np.pi / 180
+
+    # Translate the facial area to the center of the image
+    x = (facialArea[0] + facialArea[2]) / 2 - size[1] / 2
+    y = (facialArea[1] + facialArea[3]) / 2 - size[0] / 2
+
+    # Rotate the facial area
+    xNew = x * np.cos(angle) + y * direction * np.sin(angle)
+    yNew = -x * direction * np.sin(angle) + y * np.cos(angle)
+    
+    # Translate the facial area back to the original position
+    xNew = xNew + size[1] / 2
+    yNew = yNew + size[0] / 2
+    
+    # Calculate the new facial area
+    x1 = xNew - (facialArea[2] - facialArea[0]) / 2
+    y1 = yNew - (facialArea[3] - facialArea[1]) / 2
+    x2 = xNew + (facialArea[2] - facialArea[0]) / 2
+    y2 = yNew + (facialArea[3] - facialArea[1]) / 2
+
+    return (int(x1), int(y1), int(x2), int(y2))
