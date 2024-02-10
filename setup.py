@@ -1,3 +1,4 @@
+import json
 import setuptools
 
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -6,13 +7,17 @@ with open("README.md", "r", encoding="utf-8") as fh:
 with open("requirements.txt", "r", encoding="utf-8") as f:
     requirements = f.read().split("\n")
 
+with open("package_info.json", "r", encoding="utf-8") as f:
+    package_info = json.load(f)
+
+
 setuptools.setup(
     name="retina-face",  # pip install retina-face
-    version="0.0.14",
+    version=package_info["version"],
     author="Sefik Ilkin Serengil",
     author_email="serengil@gmail.com",
     description="RetinaFace: Deep Face Detection Framework in TensorFlow for Python",
-    data_files=[("", ["README.md", "requirements.txt"])],
+    data_files=[("", ["README.md", "requirements.txt", "package_info.json"])],
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/serengil/retinaface",
