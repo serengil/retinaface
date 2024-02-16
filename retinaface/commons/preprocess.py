@@ -3,7 +3,6 @@ import base64
 from pathlib import Path
 from typing import Union
 import requests
-from PIL import Image
 import numpy as np
 import cv2
 
@@ -27,12 +26,10 @@ def get_image(img_uri: Union[str, np.ndarray]) -> np.ndarray:
 
     # if it is an external url
     elif isinstance(img_uri, str) and img_uri.startswith("http"):
-        img = np.array(
-            Image.open(requests.get(img_uri, stream=True, timeout=60).raw).convert("BGR")
-        )
+        img = load_image_from_web(url=img_uri)
 
     # then it has to be a path on filesystem
-    elif isinstance(img_uri, str):
+    elif isinstance(img_uri, (str, Path)):
         if isinstance(img_uri, Path):
             img_uri = str(img_uri)
 
@@ -70,6 +67,21 @@ def load_base64_img(uri) -> np.ndarray:
     img_bgr = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     # img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
     return img_bgr
+
+
+def load_image_from_web(url: str) -> np.ndarray:
+    """
+    Loading an image from web
+    Args:
+        url: link for the image
+    Returns:
+        img (np.ndarray): equivalent to pre-loaded image from opencv (BGR format)
+    """
+    response = requests.get(url, stream=True, timeout=60)
+    response.raise_for_status()
+    image_array = np.asarray(bytearray(response.raw.read()), dtype=np.uint8)
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    return image
 
 
 def resize_image(img: np.ndarray, scales: list, allow_upscaling: bool) -> tuple:
