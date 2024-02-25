@@ -75,7 +75,7 @@ def test_alignment_for_clock_way():
 
 
 def do_alignment_checks(img: np.ndarray, expected_faces: int) -> None:
-    faces = RetinaFace.extract_faces(img_path=img, align=True, expand_face_area=100)
+    faces = RetinaFace.extract_faces(img_path=img, align=True, expand_face_area=10)
 
     # it has one clear face
     assert len(faces) == expected_faces
