@@ -52,7 +52,7 @@ def test_analyze_crowded_photo():
         plt.imshow(img[:, :, ::-1])
         plt.axis("off")
         plt.show()
-        cv2.imwrite("outputs/" + img_path.split("/")[1], img)
+        # cv2.imwrite("outputs/" + img_path.split("/")[1], img)
 
     logger.info("✅ Crowded photo analysis test done")
 
@@ -75,7 +75,7 @@ def test_alignment_for_clock_way():
 
 
 def do_alignment_checks(img: np.ndarray, expected_faces: int) -> None:
-    faces = RetinaFace.extract_faces(img_path=img, align=True, expand_face_area=10)
+    faces = RetinaFace.extract_faces(img_path=img, align=True, expand_face_area=25)
 
     # it has one clear face
     assert len(faces) == expected_faces
@@ -93,3 +93,17 @@ def do_alignment_checks(img: np.ndarray, expected_faces: int) -> None:
 
         # check eyes are on same horizantal
         assert abs(right_eye[1] - left_eye[1]) < 10
+
+
+def test_different_expanding_ratios():
+    expand_ratios = [0, 25, 50]
+
+    for expand_ratio in expand_ratios:
+        faces = RetinaFace.extract_faces(
+            img_path="tests/dataset/img11.jpg", align=True, expand_face_area=expand_ratio
+        )
+        for face in faces:
+            if do_plotting is True:
+                plt.imshow(face)
+                plt.axis("off")
+                plt.show()
