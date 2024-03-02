@@ -245,16 +245,20 @@ def extract_faces(
 
         x = facial_area[0]
         y = facial_area[1]
-        w = facial_area[2]
-        h = facial_area[3]
+        w = facial_area[2] - x
+        h = facial_area[3] - y
 
-        # expand the facial area to be extracted and stay within img.shape limits
-        x1 = max(0, x - int((w * expand_face_area) / 100))  # expand left
-        y1 = max(0, y - int((h * expand_face_area) / 100))  # expand top
-        x2 = min(img.shape[1], w + int((w * expand_face_area) / 100))  # expand right
-        y2 = min(img.shape[0], h + int((h * expand_face_area) / 100))  # expand bottom
+        if expand_face_area > 0:
+            expanded_w = w + int(w * expand_face_area / 100)
+            expanded_h = h + int(h * expand_face_area / 100)
 
-        facial_img = img[y1:y2, x1:x2]
+            # overwrite facial area
+            x = max(0, x - int((expanded_w - w) / 2))
+            y = max(0, y - int((expanded_h - h) / 2))
+            w = min(img.shape[1] - x, expanded_w)
+            h = min(img.shape[0] - y, expanded_h)
+
+        facial_img = img[y : y + h, x : x + w]
 
         if align is True:
             landmarks = identity["landmarks"]
@@ -265,32 +269,17 @@ def extract_faces(
             # mouth_left = landmarks["mouth_left"]
 
             # notice that left eye of one is seen on the right from your perspective
-            facial_img, rotate_angle, rotate_direction = postprocess.alignment_procedure(
+            aligned_img, rotate_angle, rotate_direction = postprocess.alignment_procedure(
                 img=img, left_eye=right_eye, right_eye=left_eye, nose=nose
             )
 
             # find new facial area coordinates after alignment
-            projected_facial_area = postprocess.rotate_facial_area(
-                facial_area, rotate_angle, rotate_direction, img.shape
+            rotated_x1, rotated_y1, rotated_x2, rotated_y2 = postprocess.rotate_facial_area(
+                (x, y, x + w, y + h), rotate_angle, rotate_direction, img.shape
             )
-            # Expand the facial area to be extracted and stay within img.shape limits
-            x1 = max(
-                0,
-                projected_facial_area[0] - int((projected_facial_area[2] * expand_face_area) / 100),
-            )
-            y1 = max(
-                0,
-                projected_facial_area[1] - int((projected_facial_area[3] * expand_face_area) / 100),
-            )
-            x2 = min(
-                img.shape[1],
-                projected_facial_area[2] + int((projected_facial_area[2] * expand_face_area) / 100),
-            )
-            y2 = min(
-                img.shape[0],
-                projected_facial_area[3] + int((projected_facial_area[3] * expand_face_area) / 100),
-            )
-            facial_img = facial_img[y1:y2, x1:x2]
+            facial_img = aligned_img[
+                int(rotated_y1) : int(rotated_y2), int(rotated_x1) : int(rotated_x2)
+            ]
 
         resp.append(facial_img[:, :, ::-1])
 
