@@ -119,7 +119,7 @@ def build_model() -> Model:
 
     pooling0_pad = ZeroPadding2D(padding=tuple([1, 1]))(relu0)
 
-    pooling0 = MaxPool2D((3, 3), (2, 2), padding="VALID", name="pooling0")(pooling0_pad)
+    pooling0 = MaxPool2D((3, 3), (2, 2), padding="valid", name="pooling0")(pooling0_pad)
 
     stage1_unit1_bn1 = BatchNormalization(
         epsilon=1.9999999494757503e-05, name="stage1_unit1_bn1", trainable=False
