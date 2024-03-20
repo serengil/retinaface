@@ -87,6 +87,8 @@ def alignment_procedure(
 
         img = Image.fromarray(img)
         img = np.array(img.rotate(direction * angle))
+    else:
+        angle = 0.0  # Dummy value for undefined angle
 
     # -----------------------
 
