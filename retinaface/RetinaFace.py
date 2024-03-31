@@ -3,6 +3,10 @@ import warnings
 import logging
 from typing import Union, Any, Optional, Dict
 
+# this has to be set before importing tf
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
+# pylint: disable=wrong-import-position
 import numpy as np
 import tensorflow as tf
 
@@ -10,6 +14,10 @@ from retinaface import __version__
 from retinaface.model import retinaface_model
 from retinaface.commons import preprocess, postprocess
 from retinaface.commons.logger import Logger
+from retinaface.commons import package_utils
+
+# users should install tf_keras package if they are using tf 2.16 or later versions
+package_utils.validate_for_keras3()
 
 logger = Logger(module="retinaface/RetinaFace.py")
 
