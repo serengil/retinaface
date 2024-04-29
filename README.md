@@ -87,8 +87,6 @@ for face in faces:
 
 <p align="center"><img src="https://raw.githubusercontent.com/serengil/retinaface/master/tests/outputs/alignment-procedure.png" width="80%" height="80%"></p>
 
-If you prefer to prioritize alignment before detection, you may opt to set the `align_first` parameter to True. By following this approach, you will eliminate the black pixel areas that arise as a result of alignment following detection. This functionality is applicable only when the provided image contains a single face.
-
 **Face Recognition** - [`Demo`](https://youtu.be/WnUVYQP4h44)
 
 Notice that face recognition module of insightface project is [ArcFace](https://sefiks.com/2020/12/14/deep-face-recognition-with-arcface-in-keras-and-python/), and face detection module is RetinaFace. ArcFace and RetinaFace pair is wrapped in [deepface](https://github.com/serengil/deepface) library for Python. Consider to use deepface if you need an end-to-end face recognition pipeline.
