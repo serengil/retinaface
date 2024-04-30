@@ -14,6 +14,7 @@
 [![Support me on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dserengil%26type%3Dpatrons&style=flat)](https://www.patreon.com/serengil?repo=retinaface)
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/serengil?logo=GitHub&color=lightgray)](https://github.com/sponsors/serengil)
 
+[![DOI](http://img.shields.io/:DOI-10.17671/gazibtd.1399077-blue.svg?style=flat)](https://doi.org/10.17671/gazibtd.1399077)
 [![DOI](http://img.shields.io/:DOI-10.1109/ASYU50717.2020.9259802-blue.svg?style=flat)](https://doi.org/10.1109/ASYU50717.2020.9259802)
 [![DOI](http://img.shields.io/:DOI-10.1109/ICEET53442.2021.9659697-blue.svg?style=flat)](https://doi.org/10.1109/ICEET53442.2021.9659697)
 
@@ -124,6 +125,21 @@ This work is mainly based on the [insightface](https://github.com/deepinsight/in
 ## Citation
 
 If you are using RetinaFace in your research, please consider to cite its [original research paper](https://arxiv.org/abs/1905.00641). Besides, if you are using this re-implementation of retinaface, please consider to cite the following research papers as well. Here are examples of BibTeX entries:
+
+```BibTeX
+@article{serengil2024lightface,
+  title         = {A Benchmark of Facial Recognition Pipelines and Co-Usability Performances of Modules},
+  author        = {Serengil, Sefik Ilkin and Ozpinar, Alper},
+  journal       = {Bilisim Teknolojileri Dergisi},
+  volume        = {17},
+  number        = {2},
+  pages         = {95-107},
+  year          = {2024},
+  doi           = {10.17671/gazibtd.1399077},
+  url           = {https://dergipark.org.tr/en/pub/gazibtd/issue/84331/1399077},
+  publisher     = {Gazi University}
+}
+```
 
 ```BibTeX
 @inproceedings{serengil2020lightface,
