@@ -125,7 +125,7 @@ This work is mainly based on the [insightface](https://github.com/deepinsight/in
 
 ## Citation
 
-If you are using RetinaFace in your research, please consider to cite its [original research paper](https://arxiv.org/abs/1905.00641). Besides, if you are using this re-implementation of retinaface, please consider to cite the following research papers as well. Here are examples of BibTeX entries:
+If you are using RetinaFace in your research, please consider to cite its [original research paper](https://arxiv.org/abs/1905.00641). Besides, if you are using this re-implementation of retinaface, please consider to cite the following research papers as well. Here are examples of BibTeX entry:
 
 ```BibTeX
 @article{serengil2024lightface,
@@ -142,6 +142,7 @@ If you are using RetinaFace in your research, please consider to cite its [origi
 }
 ```
 
+<!--
 ```BibTeX
 @inproceedings{serengil2020lightface,
   title        = {LightFace: A Hybrid Deep Face Recognition Framework},
@@ -167,6 +168,7 @@ If you are using RetinaFace in your research, please consider to cite its [origi
   organization = {IEEE}
 }
 ```
+-->
 
 Finally, if you use this RetinaFace re-implementation in your GitHub projects, please add `retina-face` dependency in the requirements.txt.
 
