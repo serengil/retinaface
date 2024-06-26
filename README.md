@@ -131,7 +131,7 @@ If you are using RetinaFace in your research, please consider to cite its [origi
 @article{serengil2024lightface,
   title     = {A Benchmark of Facial Recognition Pipelines and Co-Usability Performances of Modules},
   author    = {Serengil, Sefik and Ozpinar, Alper},
-  journal   = {Bilisim Teknolojileri Dergisi},
+  journal   = {Journal of Information Technologies},
   volume    = {17},
   number    = {2},
   pages     = {95-107},
