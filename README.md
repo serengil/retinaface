@@ -142,6 +142,7 @@ If you are using RetinaFace in your research, please consider to cite its [origi
 }
 ```
 
+<!--
 ```BibTeX
 @inproceedings{serengil2020lightface,
   title        = {LightFace: A Hybrid Deep Face Recognition Framework},
@@ -167,6 +168,7 @@ If you are using RetinaFace in your research, please consider to cite its [origi
   organization = {IEEE}
 }
 ```
+-->
 
 Finally, if you use this RetinaFace re-implementation in your GitHub projects, please add `retina-face` dependency in the requirements.txt.
 
