@@ -119,6 +119,8 @@ You can also support this work on [Patreon](https://www.patreon.com/serengil?rep
 <img src="https://raw.githubusercontent.com/serengil/retinaface/master/icons/bmc-button.png" width="25%" height="25%">
 </a>
 
+Also, your company's logo will be shown on README on GitHub if you become sponsor in gold, silver or bronze tiers.
+
 ## Acknowledgements
 
 This work is mainly based on the [insightface](https://github.com/deepinsight/insightface) project and [retinaface](https://arxiv.org/pdf/1905.00641.pdf) paper; and it is heavily inspired from the re-implementation of [retinaface-tf2](https://github.com/StanislasBertrand/RetinaFace-tf2) by [Stanislas Bertrand](https://github.com/StanislasBertrand). Finally, Bertrand's [implementation](https://github.com/StanislasBertrand/RetinaFace-tf2/blob/master/rcnn/cython/cpu_nms.pyx) uses [Fast R-CNN](https://arxiv.org/abs/1504.08083) written by [Ross Girshick](https://github.com/rbgirshick/fast-rcnn) in the background. All of those reference studies are licensed under MIT license.
