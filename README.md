@@ -144,7 +144,6 @@ If you are using RetinaFace in your research, please consider to cite its [origi
 }
 ```
 
-<!--
 ```BibTeX
 @inproceedings{serengil2020lightface,
   title        = {LightFace: A Hybrid Deep Face Recognition Framework},
@@ -157,20 +156,6 @@ If you are using RetinaFace in your research, please consider to cite its [origi
   organization = {IEEE}
 }
 ```
-
-```BibTeX
-@inproceedings{serengil2021lightface,
-  title        = {HyperExtended LightFace: A Facial Attribute Analysis Framework},
-  author       = {Serengil, Sefik Ilkin and Ozpinar, Alper},
-  booktitle    = {2021 International Conference on Engineering and Emerging Technologies (ICEET)},
-  pages        = {1-4},
-  year         = {2021},
-  doi          = {10.1109/ICEET53442.2021.9659697},
-  url          = {https://doi.org/10.1109/ICEET53442.2021.9659697},
-  organization = {IEEE}
-}
-```
--->
 
 Finally, if you use this RetinaFace re-implementation in your GitHub projects, please add `retina-face` dependency in the requirements.txt.
 
