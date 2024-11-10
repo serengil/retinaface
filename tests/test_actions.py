@@ -107,3 +107,13 @@ def test_different_expanding_ratios():
                 plt.imshow(face)
                 plt.axis("off")
                 plt.show()
+
+
+def test_resize():
+    faces = RetinaFace.extract_faces(img_path="tests/dataset/img11.jpg", target_size=(224, 224))
+    for face in faces:
+        assert face.shape == (224, 224, 3)
+        if do_plotting is True:
+            plt.imshow(face)
+            plt.show()
+    logger.info("✅ resize test done")
