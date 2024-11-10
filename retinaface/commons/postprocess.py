@@ -1,8 +1,11 @@
+# built-in dependencies
 import math
 from typing import Union, Tuple
+
+# 3rd party dependencies
 import numpy as np
 from PIL import Image
-
+import cv2
 
 # pylint: disable=unused-argument
 
@@ -141,6 +144,55 @@ def rotate_facial_area(
     y2 = min(int(y2), height)
 
     return (x1, y1, x2, y2)
+
+
+def resize_image(
+    img: np.ndarray, target_size: Tuple[int, int], min_max_norm: bool = True
+) -> np.ndarray:
+    """
+    Resize an image to expected size of a ml model with adding black pixels.
+        Ref: github.com/serengil/deepface/blob/master/deepface/modules/preprocessing.py
+    Args:
+        img (np.ndarray): pre-loaded image as numpy array
+        target_size (tuple): input shape of ml model
+        min_max_norm (bool): set this to True if you want to normalize image in [0, 1].
+            this is only running when target_size is not none.
+            for instance, matplotlib expects inputs in this scale. (default is True)
+    Returns:
+        img (np.ndarray): resized input image
+    """
+    factor_0 = target_size[0] / img.shape[0]
+    factor_1 = target_size[1] / img.shape[1]
+    factor = min(factor_0, factor_1)
+
+    dsize = (
+        int(img.shape[1] * factor),
+        int(img.shape[0] * factor),
+    )
+    img = cv2.resize(img, dsize)
+
+    diff_0 = target_size[0] - img.shape[0]
+    diff_1 = target_size[1] - img.shape[1]
+
+    # Put the base image in the middle of the padded image
+    img = np.pad(
+        img,
+        (
+            (diff_0 // 2, diff_0 - diff_0 // 2),
+            (diff_1 // 2, diff_1 - diff_1 // 2),
+            (0, 0),
+        ),
+        "constant",
+    )
+
+    # double check: if target image is not still the same size with target.
+    if img.shape[0:2] != target_size:
+        img = cv2.resize(img, target_size)
+
+    if min_max_norm is True and img.max() > 1:
+        img = (img.astype(np.float32) / 255.0).astype(np.float32)
+
+    return img
 
 
 def bbox_pred(boxes, box_deltas):

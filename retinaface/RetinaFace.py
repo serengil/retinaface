@@ -1,7 +1,7 @@
 import os
 import warnings
 import logging
-from typing import Union, Any, Optional, Dict
+from typing import Union, Any, Optional, Dict, Tuple, List
 
 # this has to be set before importing tf
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
@@ -55,6 +55,7 @@ def build_model() -> Any:
             input_signature=(tf.TensorSpec(shape=[None, None, None, 3], dtype=np.float32),),
         )
 
+    # pylint: disable=possibly-used-before-assignment
     return model
 
 
@@ -220,7 +221,9 @@ def extract_faces(
     align: bool = True,
     allow_upscaling: bool = True,
     expand_face_area: int = 0,
-) -> list:
+    target_size: Optional[Tuple[int, int]] = None,
+    min_max_norm: bool = True,
+) -> List[np.ndarray]:
     """
     Extract detected and aligned faces
     Args:
@@ -230,6 +233,13 @@ def extract_faces(
         align (bool): enable or disable alignment
         allow_upscaling (bool): allowing up-scaling
         expand_face_area (int): expand detected facial area with a percentage
+        target_size (optional tuple): resize the image by padding it with black pixels
+            to fit the specified dimensions. default is None
+        min_max_norm (bool): set this to True if you want to normalize image in [0, 1].
+            this is only running when target_size is not none.
+            for instance, matplotlib expects inputs in this scale. (default is True)
+    Returns:
+        result (List[np.ndarray]): list of extracted faces
     """
     resp = []
 
@@ -289,6 +299,14 @@ def extract_faces(
                 int(rotated_y1) : int(rotated_y2), int(rotated_x1) : int(rotated_x2)
             ]
 
-        resp.append(facial_img[:, :, ::-1])
+        if target_size is not None:
+            facial_img = postprocess.resize_image(
+                img=facial_img, target_size=target_size, min_max_norm=min_max_norm
+            )
+
+        # to rgb
+        facial_img = facial_img[:, :, ::-1]
+
+        resp.append(facial_img)
 
     return resp
