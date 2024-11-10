@@ -55,6 +55,7 @@ def build_model() -> Any:
             input_signature=(tf.TensorSpec(shape=[None, None, None, 3], dtype=np.float32),),
         )
 
+    # pylint: disable=possibly-used-before-assignment
     return model
 
 

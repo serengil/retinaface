@@ -6,14 +6,6 @@ from typing import Union, Tuple
 import numpy as np
 from PIL import Image
 import cv2
-import tensorflow as tf
-
-tf_major_version = int(tf.__version__.split(".", maxsplit=1)[0])
-if tf_major_version == 1:
-    from keras.preprocessing import image
-else:
-    from tensorflow.keras.preprocessing import image
-
 
 # pylint: disable=unused-argument
 
@@ -196,9 +188,6 @@ def resize_image(
     # double check: if target image is not still the same size with target.
     if img.shape[0:2] != target_size:
         img = cv2.resize(img, target_size)
-
-    # make it 4-dimensional how ML models expect
-    img = image.img_to_array(img)
 
     if min_max_norm is True and img.max() > 1:
         img = (img.astype(np.float32) / 255.0).astype(np.float32)
