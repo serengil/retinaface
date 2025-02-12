@@ -60,20 +60,20 @@ def build_model() -> Any:
 
 
 def detect_faces(
-    img_path: Union[str, np.ndarray],
+    img_path: Union[str, np.ndarray, List[Union[str, np.ndarray]]],
     threshold: float = 0.9,
     model: Optional[Model] = None,
     allow_upscaling: bool = True,
-) -> Dict[str, Any]:
+) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
     """
-    Detect the facial area for a given image
+    Detect the facial area for a given image or list of images.
     Args:
-        img_path (str or numpy array): given image
+        img_path (str, numpy array, or list): given image(s)
         threshold (float): threshold for detection
         model (Model): pre-trained model can be given
         allow_upscaling (bool): allowing up-scaling
     Returns:
-        detected faces as:
+        detected faces or list of detected faces:
         {
             "face_1": {
                 "score": 0.9993440508842468,
@@ -88,21 +88,38 @@ def detect_faces(
             }
         }
     """
-    resp = {}
-    img = preprocess.get_image(img_path)
-
-    # ---------------------------
-
     if model is None:
         model = build_model()
 
+    # Handle single image input by converting it to a list
+    if not isinstance(img_path, list):
+        img_path = [img_path]
+
+    # Preprocess all images
+    preprocessed_images = []
+    im_infos = []
+    im_scales = []
+    for img in img_path:
+        img = preprocess.get_image(img)
+        im_tensor, im_info, im_scale = preprocess.preprocess_image(img, allow_upscaling)
+        # Ensure im_tensor has the correct shape
+        # im_tensor = tf.expand_dims(im_tensor, axis=0)  # Add batch dimension if necessary
+        preprocessed_images.append(im_tensor)
+        im_infos.append(im_info)
+        im_scales.append(im_scale)
+
+    # Stack images into a batch
+    batch_tensor = tf.concat(preprocessed_images, axis=0)  # Concatenate along batch dimension
+
+    # Forward pass on all images
+    net_out = model(batch_tensor)
+    net_out = [elt.numpy() for elt in net_out]
+
+    # Postprocess all predictions
     # ---------------------------
 
-    nms_threshold = 0.4
-    decay4 = 0.5
-
+    _num_anchors = {"stride32": 2, "stride16": 2, "stride8": 2}
     _feat_stride_fpn = [32, 16, 8]
-
     _anchors_fpn = {
         "stride32": np.array(
             [[-248.0, -248.0, 263.0, 263.0], [-120.0, -120.0, 135.0, 135.0]], dtype=np.float32
@@ -112,106 +129,106 @@ def detect_faces(
         ),
         "stride8": np.array([[-8.0, -8.0, 23.0, 23.0], [0.0, 0.0, 15.0, 15.0]], dtype=np.float32),
     }
-
-    _num_anchors = {"stride32": 2, "stride16": 2, "stride8": 2}
+    nms_threshold = 0.4
+    decay4 = 0.5
 
     # ---------------------------
 
-    proposals_list = []
-    scores_list = []
-    landmarks_list = []
-    im_tensor, im_info, im_scale = preprocess.preprocess_image(img, allow_upscaling)
-    net_out = model(im_tensor)
-    net_out = [elt.numpy() for elt in net_out]
-    sym_idx = 0
+    batch_responses = []
+    for batch_idx, (im_info, im_scale) in enumerate(zip(im_infos, im_scales)):
+        resp = {}
+        sym_idx = 0
+        proposals_list = []
+        scores_list = []
+        landmarks_list = []
 
-    for _, s in enumerate(_feat_stride_fpn):
-        # _key = f"stride{s}"
-        scores = net_out[sym_idx]
-        scores = scores[:, :, :, _num_anchors[f"stride{s}"] :]
+        for _, s in enumerate(_feat_stride_fpn):
+            scores = net_out[sym_idx][[batch_idx]]
+            scores = scores[:, :, :, _num_anchors[f"stride{s}"]:]
 
-        bbox_deltas = net_out[sym_idx + 1]
-        height, width = bbox_deltas.shape[1], bbox_deltas.shape[2]
+            bbox_deltas = net_out[sym_idx + 1][[batch_idx]]
+            height, width = bbox_deltas.shape[1], bbox_deltas.shape[2]
 
-        A = _num_anchors[f"stride{s}"]
-        K = height * width
-        anchors_fpn = _anchors_fpn[f"stride{s}"]
-        anchors = postprocess.anchors_plane(height, width, s, anchors_fpn)
-        anchors = anchors.reshape((K * A, 4))
-        scores = scores.reshape((-1, 1))
+            A = _num_anchors[f"stride{s}"]
+            K = height * width
+            anchors_fpn = _anchors_fpn[f"stride{s}"]
+            anchors = postprocess.anchors_plane(height, width, s, anchors_fpn)
+            anchors = anchors.reshape((K * A, 4))
+            scores = scores.reshape((-1, 1))
 
-        bbox_stds = [1.0, 1.0, 1.0, 1.0]
-        bbox_pred_len = bbox_deltas.shape[3] // A
-        bbox_deltas = bbox_deltas.reshape((-1, bbox_pred_len))
-        bbox_deltas[:, 0::4] = bbox_deltas[:, 0::4] * bbox_stds[0]
-        bbox_deltas[:, 1::4] = bbox_deltas[:, 1::4] * bbox_stds[1]
-        bbox_deltas[:, 2::4] = bbox_deltas[:, 2::4] * bbox_stds[2]
-        bbox_deltas[:, 3::4] = bbox_deltas[:, 3::4] * bbox_stds[3]
-        proposals = postprocess.bbox_pred(anchors, bbox_deltas)
+            bbox_stds = [1.0, 1.0, 1.0, 1.0]
+            bbox_pred_len = bbox_deltas.shape[3] // A
+            bbox_deltas = bbox_deltas.reshape((-1, bbox_pred_len))
+            bbox_deltas[:, 0::4] = bbox_deltas[:, 0::4] * bbox_stds[0]
+            bbox_deltas[:, 1::4] = bbox_deltas[:, 1::4] * bbox_stds[1]
+            bbox_deltas[:, 2::4] = bbox_deltas[:, 2::4] * bbox_stds[2]
+            bbox_deltas[:, 3::4] = bbox_deltas[:, 3::4] * bbox_stds[3]
+            proposals = postprocess.bbox_pred(anchors, bbox_deltas)
 
-        proposals = postprocess.clip_boxes(proposals, im_info[:2])
+            proposals = postprocess.clip_boxes(proposals, im_info[:2])
 
-        if s == 4 and decay4 < 1.0:
-            scores *= decay4
+            if s == 4 and decay4 < 1.0:
+                scores *= decay4
 
+            scores_ravel = scores.ravel()
+            order = np.where(scores_ravel >= threshold)[0]
+            proposals = proposals[order, :]
+            scores = scores[order]
+
+            proposals[:, 0:4] /= im_scale
+            proposals_list.append(proposals)
+            scores_list.append(scores)
+
+            landmark_deltas = net_out[sym_idx + 2][[batch_idx]]
+            landmark_pred_len = landmark_deltas.shape[3] // A
+            landmark_deltas = landmark_deltas.reshape((-1, 5, landmark_pred_len // 5))
+            landmarks = postprocess.landmark_pred(anchors, landmark_deltas)
+            landmarks = landmarks[order, :]
+
+            landmarks[:, :, 0:2] /= im_scale
+            landmarks_list.append(landmarks)
+            sym_idx += 3
+
+        proposals = np.vstack(proposals_list)
+
+        if proposals.shape[0] == 0:
+            batch_responses.append(resp)
+            continue
+
+        scores = np.vstack(scores_list)
         scores_ravel = scores.ravel()
-        order = np.where(scores_ravel >= threshold)[0]
+        order = scores_ravel.argsort()[::-1]
+
         proposals = proposals[order, :]
         scores = scores[order]
+        landmarks = np.vstack(landmarks_list)
+        landmarks = landmarks[order].astype(np.float32, copy=False)
 
-        proposals[:, 0:4] /= im_scale
-        proposals_list.append(proposals)
-        scores_list.append(scores)
+        pre_det = np.hstack((proposals[:, 0:4], scores)).astype(np.float32, copy=False)
 
-        landmark_deltas = net_out[sym_idx + 2]
-        landmark_pred_len = landmark_deltas.shape[3] // A
-        landmark_deltas = landmark_deltas.reshape((-1, 5, landmark_pred_len // 5))
-        landmarks = postprocess.landmark_pred(anchors, landmark_deltas)
-        landmarks = landmarks[order, :]
+        keep = postprocess.cpu_nms(pre_det, nms_threshold)
 
-        landmarks[:, :, 0:2] /= im_scale
-        landmarks_list.append(landmarks)
-        sym_idx += 3
+        det = np.hstack((pre_det, proposals[:, 4:]))
+        det = det[keep, :]
+        landmarks = landmarks[keep]
 
-    proposals = np.vstack(proposals_list)
+        for idx, face in enumerate(det):
+            label = "face_" + str(idx + 1)
+            resp[label] = {}
+            resp[label]["score"] = face[4]
 
-    if proposals.shape[0] == 0:
-        return resp
+            resp[label]["facial_area"] = list(face[0:4].astype(int))
 
-    scores = np.vstack(scores_list)
-    scores_ravel = scores.ravel()
-    order = scores_ravel.argsort()[::-1]
+            resp[label]["landmarks"] = {}
+            resp[label]["landmarks"]["right_eye"] = list(landmarks[idx][0])
+            resp[label]["landmarks"]["left_eye"] = list(landmarks[idx][1])
+            resp[label]["landmarks"]["nose"] = list(landmarks[idx][2])
+            resp[label]["landmarks"]["mouth_right"] = list(landmarks[idx][3])
+            resp[label]["landmarks"]["mouth_left"] = list(landmarks[idx][4])
 
-    proposals = proposals[order, :]
-    scores = scores[order]
-    landmarks = np.vstack(landmarks_list)
-    landmarks = landmarks[order].astype(np.float32, copy=False)
+        batch_responses.append(resp)
 
-    pre_det = np.hstack((proposals[:, 0:4], scores)).astype(np.float32, copy=False)
-
-    # nms = cpu_nms_wrapper(nms_threshold)
-    # keep = nms(pre_det)
-    keep = postprocess.cpu_nms(pre_det, nms_threshold)
-
-    det = np.hstack((pre_det, proposals[:, 4:]))
-    det = det[keep, :]
-    landmarks = landmarks[keep]
-
-    for idx, face in enumerate(det):
-        label = "face_" + str(idx + 1)
-        resp[label] = {}
-        resp[label]["score"] = face[4]
-
-        resp[label]["facial_area"] = list(face[0:4].astype(int))
-
-        resp[label]["landmarks"] = {}
-        resp[label]["landmarks"]["right_eye"] = list(landmarks[idx][0])
-        resp[label]["landmarks"]["left_eye"] = list(landmarks[idx][1])
-        resp[label]["landmarks"]["nose"] = list(landmarks[idx][2])
-        resp[label]["landmarks"]["mouth_right"] = list(landmarks[idx][3])
-        resp[label]["landmarks"]["mouth_left"] = list(landmarks[idx][4])
-
-    return resp
+    return batch_responses if len(batch_responses) > 1 else batch_responses[0]
 
 
 def extract_faces(
