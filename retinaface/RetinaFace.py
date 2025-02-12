@@ -273,7 +273,10 @@ def extract_faces(
 
     # Detect faces in all images
     detections = detect_faces(
-        img_path=preprocessed_images, threshold=threshold, model=model, allow_upscaling=allow_upscaling
+        img_path=preprocessed_images,
+        threshold=threshold,
+        model=model,
+        allow_upscaling=allow_upscaling
     )
     if isinstance(detections, dict):
         detections = [detections]
@@ -317,7 +320,10 @@ def extract_faces(
 
                 # Find new facial area coordinates after alignment
                 rotated_x1, rotated_y1, rotated_x2, rotated_y2 = postprocess.rotate_facial_area(
-                    (x, y, x + w, y + h), rotate_angle, rotate_direction, (img.shape[0], img.shape[1])
+                    (x, y, x + w, y + h),
+                    rotate_angle,
+                    rotate_direction,
+                    (img.shape[0], img.shape[1])
                 )
                 facial_img = aligned_img[
                     int(rotated_y1) : int(rotated_y2), int(rotated_x1) : int(rotated_x2)
