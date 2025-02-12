@@ -117,3 +117,68 @@ def test_resize():
             plt.imshow(face)
             plt.show()
     logger.info("✅ resize test done")
+
+
+def test_batch_resize():
+    img_path = "tests/dataset/img11.jpg"
+    faces = RetinaFace.extract_faces(img_path=[img_path, img_path], target_size=(224, 224))
+    assert len(faces) == 2 and all(len(image_faces) == 1 for image_faces in faces)
+    for image_faces in faces:
+        for face in image_faces:
+            assert face.shape == (224, 224, 3)
+    logger.info("✅ batch resize test done")
+
+
+def test_batch_extraction_consistency():
+    import tensorflow as tf
+    from retinaface.commons import preprocess
+    img_paths = [
+        "tests/dataset/img11.jpg", 
+        "tests/dataset/img3.jpg",
+        "tests/dataset/img11.jpg", 
+        "tests/dataset/img3.jpg",
+        "tests/dataset/img11.jpg", 
+    ]
+    max_width = 0
+    max_height = 0
+
+    # Determine the maximum width and height among all images
+    for img_path in img_paths:
+        img = preprocess.get_image(img_path)
+        if img.shape[1] > max_width:
+            max_width = img.shape[1]
+        if img.shape[0] > max_height:
+            max_height = img.shape[0]
+
+    # Resize images to the maximum dimensions
+    resized_images = []
+    for img_path in img_paths:
+        img: np.ndarray = preprocess.get_image(img_path)
+        resized_img = tf.image.resize_with_pad(img, max_height, max_width)
+        resized_img = (resized_img.numpy() * 255).astype(np.uint8)
+        resized_images.append(resized_img)
+    batch_faces = RetinaFace.extract_faces(
+        img_path=resized_images, 
+        # img_path=img_paths, 
+        align=True, 
+        expand_face_area=25,
+        target_size=(224, 224),
+    )
+
+    # Ensure batch processing returns the correct number of results
+    assert len(batch_faces) == len(img_paths)
+
+    # Process each image individually and compare results
+    for i, resized_image in enumerate(resized_images):
+        individual_faces = RetinaFace.extract_faces(
+            img_path=resized_image, 
+            align=True, 
+            expand_face_area=25,
+            target_size=(224, 224),
+        )
+        assert len(individual_faces) == len(batch_faces[i])
+        for j, face in enumerate(individual_faces):
+            # Compare each face in the batch with the individual result
+            assert np.array_equal(face, batch_faces[i][j])
+
+    logger.info("✅ Batch extraction consistency test done")
