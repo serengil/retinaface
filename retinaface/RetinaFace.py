@@ -1,7 +1,7 @@
 import os
 import warnings
 import logging
-from typing import Union, Any, Optional, Dict, Tuple, List
+from typing import Union, Any, Optional, Dict, Tuple, List, Sequence
 
 # this has to be set before importing tf
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
@@ -60,7 +60,7 @@ def build_model() -> Any:
 
 
 def detect_faces(
-    img_path: Union[str, np.ndarray, List[Union[str, np.ndarray]]],
+    img_path: Union[str, np.ndarray, Sequence[Union[str, np.ndarray]]],
     threshold: float = 0.9,
     model: Optional[Model] = None,
     allow_upscaling: bool = True,
@@ -232,7 +232,7 @@ def detect_faces(
 
 
 def extract_faces(
-    img_path: Union[str, np.ndarray],
+    img_path: Union[str, np.ndarray, Sequence[Union[str, np.ndarray]]],
     threshold: float = 0.9,
     model: Optional[Model] = None,
     align: bool = True,
@@ -240,11 +240,11 @@ def extract_faces(
     expand_face_area: int = 0,
     target_size: Optional[Tuple[int, int]] = None,
     min_max_norm: bool = True,
-) -> List[np.ndarray]:
+) -> Union[List[np.ndarray], List[List[np.ndarray]]]:
     """
-    Extract detected and aligned faces
+    Extract detected and aligned faces from a given image or list of images.
     Args:
-        img_path (str or numpy): given image
+        img_path (str, numpy array, or list): given image(s)
         threshold (float): detection threshold
         model (Model): pre-trained model can be passed to the function
         align (bool): enable or disable alignment
@@ -256,74 +256,83 @@ def extract_faces(
             this is only running when target_size is not none.
             for instance, matplotlib expects inputs in this scale. (default is True)
     Returns:
-        result (List[np.ndarray]): list of extracted faces
+        result (List[np.ndarray] or List[List[np.ndarray]]): list of extracted faces
     """
-    resp = []
+    if model is None:
+        model = build_model()
 
-    # ---------------------------
+    # Handle single image input by converting it to a list
+    if not isinstance(img_path, list):
+        img_path = [img_path]
 
-    img = preprocess.get_image(img_path)
+    # Preprocess all images
+    preprocessed_images = []
+    for img in img_path:
+        img = preprocess.get_image(img)
+        preprocessed_images.append(img)
 
-    # ---------------------------
-
-    obj = detect_faces(
-        img_path=img, threshold=threshold, model=model, allow_upscaling=allow_upscaling
+    # Detect faces in all images
+    detections = detect_faces(
+        img_path=preprocessed_images, threshold=threshold, model=model, allow_upscaling=allow_upscaling
     )
+    if isinstance(detections, dict):
+        detections = [detections]
 
-    if not isinstance(obj, dict):
-        return resp
+    # Postprocess detections to extract faces
+    batch_faces = []
+    for img, obj in zip(preprocessed_images, detections):
+        faces = []
+        for _, identity in obj.items():
+            facial_area = identity["facial_area"]
+            rotate_angle = 0
+            rotate_direction = 1
 
-    for _, identity in obj.items():
-        facial_area = identity["facial_area"]
-        rotate_angle = 0
-        rotate_direction = 1
+            x = facial_area[0]
+            y = facial_area[1]
+            w = facial_area[2] - x
+            h = facial_area[3] - y
 
-        x = facial_area[0]
-        y = facial_area[1]
-        w = facial_area[2] - x
-        h = facial_area[3] - y
+            if expand_face_area > 0:
+                expanded_w = w + int(w * expand_face_area / 100)
+                expanded_h = h + int(h * expand_face_area / 100)
 
-        if expand_face_area > 0:
-            expanded_w = w + int(w * expand_face_area / 100)
-            expanded_h = h + int(h * expand_face_area / 100)
+                # overwrite facial area
+                x = max(0, x - int((expanded_w - w) / 2))
+                y = max(0, y - int((expanded_h - h) / 2))
+                w = min(img.shape[1] - x, expanded_w)
+                h = min(img.shape[0] - y, expanded_h)
 
-            # overwrite facial area
-            x = max(0, x - int((expanded_w - w) / 2))
-            y = max(0, y - int((expanded_h - h) / 2))
-            w = min(img.shape[1] - x, expanded_w)
-            h = min(img.shape[0] - y, expanded_h)
+            facial_img = img[y : y + h, x : x + w]
 
-        facial_img = img[y : y + h, x : x + w]
+            if align:
+                landmarks = identity["landmarks"]
+                left_eye = landmarks["left_eye"]
+                right_eye = landmarks["right_eye"]
+                nose = landmarks["nose"]
 
-        if align is True:
-            landmarks = identity["landmarks"]
-            left_eye = landmarks["left_eye"]
-            right_eye = landmarks["right_eye"]
-            nose = landmarks["nose"]
-            # mouth_right = landmarks["mouth_right"]
-            # mouth_left = landmarks["mouth_left"]
+                # Align the face
+                aligned_img, rotate_angle, rotate_direction = postprocess.alignment_procedure(
+                    img=img, left_eye=right_eye, right_eye=left_eye, nose=nose
+                )
 
-            # notice that left eye of one is seen on the right from your perspective
-            aligned_img, rotate_angle, rotate_direction = postprocess.alignment_procedure(
-                img=img, left_eye=right_eye, right_eye=left_eye, nose=nose
-            )
+                # Find new facial area coordinates after alignment
+                rotated_x1, rotated_y1, rotated_x2, rotated_y2 = postprocess.rotate_facial_area(
+                    (x, y, x + w, y + h), rotate_angle, rotate_direction, (img.shape[0], img.shape[1])
+                )
+                facial_img = aligned_img[
+                    int(rotated_y1) : int(rotated_y2), int(rotated_x1) : int(rotated_x2)
+                ]
 
-            # find new facial area coordinates after alignment
-            rotated_x1, rotated_y1, rotated_x2, rotated_y2 = postprocess.rotate_facial_area(
-                (x, y, x + w, y + h), rotate_angle, rotate_direction, (img.shape[0], img.shape[1])
-            )
-            facial_img = aligned_img[
-                int(rotated_y1) : int(rotated_y2), int(rotated_x1) : int(rotated_x2)
-            ]
+            if target_size is not None:
+                facial_img = postprocess.resize_image(
+                    img=facial_img, target_size=target_size, min_max_norm=min_max_norm
+                )
 
-        if target_size is not None:
-            facial_img = postprocess.resize_image(
-                img=facial_img, target_size=target_size, min_max_norm=min_max_norm
-            )
+            # Convert to RGB
+            facial_img = facial_img[:, :, ::-1]
 
-        # to rgb
-        facial_img = facial_img[:, :, ::-1]
+            faces.append(facial_img)
 
-        resp.append(facial_img)
+        batch_faces.append(faces)
 
-    return resp
+    return batch_faces if len(batch_faces) > 1 else batch_faces[0]
