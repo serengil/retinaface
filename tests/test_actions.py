@@ -204,3 +204,46 @@ def test_batch_extraction_consistency():
             assert np.array_equal(face, batch_faces[i][j])
 
     logger.info("✅ Batch extraction consistency test done")
+
+
+def test_detect_faces():
+    img_path = "tests/dataset/img11.jpg"
+    detected_faces = RetinaFace.detect_faces(img_path)
+
+    assert isinstance(detected_faces, dict)
+    assert len(detected_faces.keys()) == 1, "Expected only one face to be detected"
+
+    for idx, identity in detected_faces.items():
+        confidence = identity["score"]
+        assert confidence >= 0.9, f"Face {idx} has a confidence score below the threshold"
+
+        landmarks = identity["landmarks"]
+        assert "left_eye" in landmarks and "right_eye" in landmarks, f"Landmarks missing for face {idx}"
+
+    logger.info("✅ detect_faces test done")
+
+
+def test_batched_detect_faces():
+    img_paths = [
+        "tests/dataset/img11.jpg",
+        "tests/dataset/img3.jpg",
+        "tests/dataset/couple.jpg",
+    ]
+    resized_images = resize_images(img_paths)
+    detected_faces_batch = RetinaFace.detect_faces(img_path=resized_images)
+
+    # Ensure the batch processing returns the correct number of results
+    assert len(detected_faces_batch) == len(img_paths), "Mismatch in number of images processed"
+
+    for i, detected_faces in enumerate(detected_faces_batch):
+        assert isinstance(detected_faces, dict), f"Detection result for image {i} is not a dictionary"
+        assert len(detected_faces) > 0, f"No faces detected in image {i}"
+
+        for idx, identity in detected_faces.items():
+            confidence = identity["score"]
+            assert confidence >= 0.9, f"Face {idx} in image {i} has a confidence score below the threshold"
+
+            landmarks = identity["landmarks"]
+            assert "left_eye" in landmarks and "right_eye" in landmarks, f"Landmarks missing for face {idx} in image {i}"
+
+    logger.info("✅ Batched detect_faces test done")
