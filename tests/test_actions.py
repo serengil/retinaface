@@ -15,6 +15,31 @@ def int_tuple(t):
     return tuple(int(x) for x in t)
 
 
+def resize_images(img_paths: list[str]) -> list[np.ndarray]:
+    import tensorflow as tf
+    from retinaface.commons import preprocess
+    # Determine the maximum width and height among all images
+    max_width = 0
+    max_height = 0
+    for img_path in img_paths:
+        img = preprocess.get_image(img_path)
+        if img.shape[1] > max_width:
+            max_width = img.shape[1]
+        if img.shape[0] > max_height:
+            max_height = img.shape[0]
+
+    # Resize images to the maximum dimensions
+    resized_images = []
+    for img_path in img_paths:
+        img: np.ndarray = preprocess.get_image(img_path)
+        img = img.astype(np.float32) / 255.0
+        resized_img = tf.image.resize_with_pad(img, max_height, max_width).numpy()
+        resized_img = resized_img[..., ::-1]
+        resized_img = np.clip(resized_img * 255, 0, 255).astype(np.uint8)
+        resized_images.append(resized_img)
+    return resized_images
+
+
 def test_analyze_crowded_photo():
     img_path = "tests/dataset/img3.jpg"
     img = cv2.imread(img_path)
@@ -129,9 +154,23 @@ def test_batch_resize():
     logger.info("✅ batch resize test done")
 
 
+def test_batch_resize_different_n_faces():
+    img_paths = [
+        "tests/dataset/img11.jpg", 
+        "tests/dataset/couple.jpg", 
+    ]
+    resized_images = resize_images(img_paths)
+    faces = RetinaFace.extract_faces(img_path=resized_images, target_size=(224, 224))
+    assert len(faces) == 2
+    assert len(faces[0]) == 1
+    assert len(faces[1]) == 2
+    for image_faces in faces:
+        for face in image_faces:
+            assert face.shape == (224, 224, 3)
+    logger.info("✅ batch resize test done")
+
+
 def test_batch_extraction_consistency():
-    import tensorflow as tf
-    from retinaface.commons import preprocess
     img_paths = [
         "tests/dataset/img11.jpg", 
         "tests/dataset/img3.jpg",
@@ -139,24 +178,7 @@ def test_batch_extraction_consistency():
         "tests/dataset/img3.jpg",
         "tests/dataset/img11.jpg", 
     ]
-    max_width = 0
-    max_height = 0
-
-    # Determine the maximum width and height among all images
-    for img_path in img_paths:
-        img = preprocess.get_image(img_path)
-        if img.shape[1] > max_width:
-            max_width = img.shape[1]
-        if img.shape[0] > max_height:
-            max_height = img.shape[0]
-
-    # Resize images to the maximum dimensions
-    resized_images = []
-    for img_path in img_paths:
-        img: np.ndarray = preprocess.get_image(img_path)
-        resized_img = tf.image.resize_with_pad(img, max_height, max_width)
-        resized_img = (resized_img.numpy() * 255).astype(np.uint8)
-        resized_images.append(resized_img)
+    resized_images = resize_images(img_paths)
     batch_faces = RetinaFace.extract_faces(
         img_path=resized_images, 
         # img_path=img_paths, 
