@@ -1,3 +1,5 @@
+from typing import List
+
 import cv2
 import numpy as np
 from retinaface import RetinaFace
@@ -15,7 +17,7 @@ def int_tuple(t):
     return tuple(int(x) for x in t)
 
 
-def resize_images(img_paths: list[str]) -> list[np.ndarray]:
+def resize_images(img_paths: List[str]) -> List[np.ndarray]:
     import tensorflow as tf
     from retinaface.commons import preprocess
     # Determine the maximum width and height among all images
