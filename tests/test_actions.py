@@ -1,3 +1,5 @@
+from typing import List
+
 import cv2
 import numpy as np
 from retinaface import RetinaFace
@@ -13,6 +15,31 @@ if do_plotting is True:
 
 def int_tuple(t):
     return tuple(int(x) for x in t)
+
+
+def resize_images(img_paths: List[str]) -> List[np.ndarray]:
+    import tensorflow as tf
+    from retinaface.commons import preprocess
+    # Determine the maximum width and height among all images
+    max_width = 0
+    max_height = 0
+    for img_path in img_paths:
+        img = preprocess.get_image(img_path)
+        if img.shape[1] > max_width:
+            max_width = img.shape[1]
+        if img.shape[0] > max_height:
+            max_height = img.shape[0]
+
+    # Resize images to the maximum dimensions
+    resized_images = []
+    for img_path in img_paths:
+        img: np.ndarray = preprocess.get_image(img_path)
+        img = img.astype(np.float32) / 255.0
+        resized_img = tf.image.resize_with_pad(img, max_height, max_width).numpy()
+        resized_img = resized_img[..., ::-1]
+        resized_img = np.clip(resized_img * 255, 0, 255).astype(np.uint8)
+        resized_images.append(resized_img)
+    return resized_images
 
 
 def test_analyze_crowded_photo():
@@ -117,3 +144,108 @@ def test_resize():
             plt.imshow(face)
             plt.show()
     logger.info("✅ resize test done")
+
+
+def test_batch_resize():
+    img_path = "tests/dataset/img11.jpg"
+    faces = RetinaFace.extract_faces(img_path=[img_path, img_path], target_size=(224, 224))
+    assert len(faces) == 2 and all(len(image_faces) == 1 for image_faces in faces)
+    for image_faces in faces:
+        for face in image_faces:
+            assert face.shape == (224, 224, 3)
+    logger.info("✅ batch resize test done")
+
+
+def test_batch_resize_different_n_faces():
+    img_paths = [
+        "tests/dataset/img11.jpg", 
+        "tests/dataset/couple.jpg", 
+    ]
+    resized_images = resize_images(img_paths)
+    faces = RetinaFace.extract_faces(img_path=resized_images, target_size=(224, 224))
+    assert len(faces) == 2
+    assert len(faces[0]) == 1
+    assert len(faces[1]) == 2
+    for image_faces in faces:
+        for face in image_faces:
+            assert face.shape == (224, 224, 3)
+    logger.info("✅ batch resize test done")
+
+
+def test_batch_extraction_consistency():
+    img_paths = [
+        "tests/dataset/img11.jpg", 
+        "tests/dataset/img3.jpg",
+        "tests/dataset/img11.jpg", 
+        "tests/dataset/img3.jpg",
+        "tests/dataset/img11.jpg", 
+    ]
+    resized_images = resize_images(img_paths)
+    batch_faces = RetinaFace.extract_faces(
+        img_path=resized_images, 
+        # img_path=img_paths, 
+        align=True, 
+        expand_face_area=25,
+        target_size=(224, 224),
+    )
+
+    # Ensure batch processing returns the correct number of results
+    assert len(batch_faces) == len(img_paths)
+
+    # Process each image individually and compare results
+    for i, resized_image in enumerate(resized_images):
+        individual_faces = RetinaFace.extract_faces(
+            img_path=resized_image, 
+            align=True, 
+            expand_face_area=25,
+            target_size=(224, 224),
+        )
+        assert len(individual_faces) == len(batch_faces[i])
+        for j, face in enumerate(individual_faces):
+            # Compare each face in the batch with the individual result
+            assert np.array_equal(face, batch_faces[i][j])
+
+    logger.info("✅ Batch extraction consistency test done")
+
+
+def test_detect_faces():
+    img_path = "tests/dataset/img11.jpg"
+    detected_faces = RetinaFace.detect_faces(img_path)
+
+    assert isinstance(detected_faces, dict)
+    assert len(detected_faces.keys()) == 1, "Expected only one face to be detected"
+
+    for idx, identity in detected_faces.items():
+        confidence = identity["score"]
+        assert confidence >= 0.9, f"Face {idx} has a confidence score below the threshold"
+
+        landmarks = identity["landmarks"]
+        assert "left_eye" in landmarks and "right_eye" in landmarks, f"Landmarks missing for face {idx}"
+
+    logger.info("✅ detect_faces test done")
+
+
+def test_batched_detect_faces():
+    img_paths = [
+        "tests/dataset/img11.jpg",
+        "tests/dataset/img3.jpg",
+        "tests/dataset/couple.jpg",
+    ]
+    resized_images = resize_images(img_paths)
+    detected_faces_batch = RetinaFace.detect_faces(img_path=resized_images)
+
+    # Ensure the batch processing returns the correct number of results
+    assert len(detected_faces_batch) == len(img_paths), "Mismatch in number of images processed"
+
+    for i, detected_faces in enumerate(detected_faces_batch):
+        assert isinstance(detected_faces, dict), f"Detection result for image {i} is not a dictionary"
+        assert len(detected_faces) > 0, f"No faces detected in image {i}"
+
+        for idx, identity in detected_faces.items():
+            confidence = identity["score"]
+            assert confidence >= 0.9, f"Face {idx} in image {i} has a confidence score below the threshold"
+
+            landmarks = identity["landmarks"]
+            assert "left_eye" in landmarks and "right_eye" in landmarks, f"Landmarks missing for face {idx} in image {i}"
+
+    logger.info("✅ Batched detect_faces test done")
