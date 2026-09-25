@@ -19,10 +19,22 @@ RetinaFace is the face detection module of [insightface](https://github.com/deep
 
 ## Installation [![PyPI](https://img.shields.io/pypi/v/retina-face.svg)](https://pypi.org/project/retina-face/)
 
-The easiest way to install retinaface is to download it from [PyPI](https://pypi.org/project/retina-face/). It's going to install the library itself and its prerequisites as well.
+The easiest way to install retinaface is to download it from [PyPI](https://pypi.org/project/retina-face/). RetinaFace runs either on TensorFlow or on PyTorch, so install it with the backend engine you want to use.
 
 ```shell
-$ pip install retina-face
+# to run retinaface on top of tensorflow
+$ pip install retina-face[tensorflow]
+
+# or to run retinaface on top of pytorch
+# $ pip install retina-face[pytorch]
+```
+
+Alternatively, you can also install deepface from its source code. Source code may have new features not published in pip release yet.
+
+```shell
+$ git clone https://github.com/serengil/retinaface.git
+$ cd retinaface
+$ pip install -e .[tensorflow]  # or pip install -e .[pytorch]
 ```
 
 Then, you will be able to import the library and use its functionalities.
@@ -59,7 +71,7 @@ Then, it will return the facial area coordinates and some landmarks (eyes, nose 
 
 **Alignment** - [`Tutorial`](https://sefiks.com/2020/02/23/face-alignment-for-face-recognition-in-python-within-opencv/), [`Demo`](https://youtu.be/WA9i68g4meI)
 
-A modern face recognition [pipeline](https://sefiks.com/2020/05/01/a-gentle-introduction-to-face-recognition-in-deep-learning/) consists of 4 common stages: detect, [align](https://sefiks.com/2020/02/23/face-alignment-for-face-recognition-in-python-within-opencv/), [normalize](https://sefiks.com/2020/11/20/facial-landmarks-for-face-recognition-with-dlib/), [represent](https://sefiks.com/2020/12/14/deep-face-recognition-with-arcface-in-keras-and-python/) and [verify](https://sefiks.com/2020/05/22/fine-tuning-the-threshold-in-face-recognition/). Experiments show that alignment increases the face recognition accuracy almost 1%. Here, retinaface can find the facial landmarks including eye coordinates. In this way, it can apply alignment to detected faces with its extracting faces function.
+A modern face recognition [pipeline](https://sefiks.com/2020/05/01/a-gentle-introduction-to-face-recognition-in-deep-learning/) consists of 4 common stages: detect, [align](https://sefiks.com/2020/02/23/face-alignment-for-face-recognition-in-python-within-opencv/), [normalize](https://sefiks.com/2020/11/20/facial-landmarks-for-face-recognition-with-dlib/), [represent](https://sefiks.com/2020/12/14/deep-face-recognition-with-arcface-in-keras-and-python/) and [verify](https://sefiks.com/2020/05/22/fine-tuning-the-threshold-in-face-recognition/). [`Experiments`](https://github.com/serengil/deepface/tree/master/benchmarks) show that alignment increases the face recognition accuracy almost 7%. Here, retinaface can find the facial landmarks including eye coordinates. In this way, it can apply alignment to detected faces with its extracting faces function.
 
 ```python
 import matplotlib.pyplot as plt
@@ -112,7 +124,7 @@ This work is mainly based on the [insightface](https://github.com/deepinsight/in
 If you are using RetinaFace in your research, please consider to cite its [original research paper](https://arxiv.org/abs/1905.00641). Besides, if you are using this re-implementation of retinaface, please consider to cite the following research paper as well. Here is example of its BibTeX entry:
 
 ```BibTeX
-@article{serengil2026boosted,
+@article{deepface,
   title     =  {Boosted LightFace: A Hybrid DNN and GBM Model for Boosted Facial Recognition},
   author    =  {Serengil, Sefik Ilkin and Ozpinar, Alper},
   journal   =  {Gazi University Journal of Science},
