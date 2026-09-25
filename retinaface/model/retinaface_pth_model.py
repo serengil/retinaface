@@ -11,7 +11,7 @@ from retinaface.commons.logger import Logger
 
 logger = Logger(module="retinaface/model/retinaface_pth_model.py")
 
-# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes, too-few-public-methods
 
 # every batch normalization layer of the original model uses this epsilon
 BN_EPS = 1.9999999494757503e-05
