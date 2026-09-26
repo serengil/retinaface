@@ -1,6 +1,3 @@
-# 3rd party dependencies
-import tensorflow as tf
-
 # project dependencies
 from retinaface.commons.logger import Logger
 
@@ -8,6 +5,9 @@ logger = Logger(module="retinaface/commons/package_utils.py")
 
 
 def validate_for_keras3():
+    # pylint: disable=import-outside-toplevel
+    import tensorflow as tf
+
     tf_major = int(tf.__version__.split(".", maxsplit=1)[0])
     tf_minor = int(tf.__version__.split(".", maxsplit=-1)[1])
 

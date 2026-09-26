@@ -3,23 +3,33 @@ import warnings
 import logging
 from typing import Union, Any, Optional, Dict, Tuple, List
 
-# this has to be set before importing tf
-os.environ["TF_USE_LEGACY_KERAS"] = "1"
-
-# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position, ungrouped-imports
 import numpy as np
-import tensorflow as tf
 
 from retinaface import __version__
-from retinaface.model import retinaface_model
 from retinaface.commons import preprocess, postprocess
 from retinaface.commons.logger import Logger
-from retinaface.commons import package_utils
-
-# users should install tf_keras package if they are using tf 2.16 or later versions
-package_utils.validate_for_keras3()
+from retinaface.commons import backend_utils
 
 logger = Logger(module="retinaface/RetinaFace.py")
+
+# -----------------------------------
+# warn users about upcoming changes in backend installation.
+
+if "_DEPRECATION_WARNING_SHOWN" not in globals():
+    global _DEPRECATION_WARNING_SHOWN  # pylint: disable=global-at-module-level
+    _DEPRECATION_WARNING_SHOWN = True
+    logger.warn(
+        "\n" + "=" * 70 + "\n"
+        " ⚠️ DEPRECATION WARNING:\n"
+        " Running 'pip install retina-face' alone will no longer be sufficient and will\n"
+        " NOT install a default backend in an upcoming major release.\n\n"
+        " Currently, TensorFlow is included by default, but this behavior will be deprecated.\n"
+        " Please explicitly specify your preferred backend engine when installing:\n\n"
+        "   -> pip install retina-face[tensorflow]\n"
+        "   -> pip install retina-face[pytorch]\n\n"
+        " Otherwise, you will encounter 'module not found' errors.\n" + "=" * 70 + "\n"
+    )
 
 # pylint: disable=global-variable-undefined, no-name-in-module, unused-import, too-many-locals, redefined-outer-name, too-many-statements, too-many-arguments
 
@@ -27,17 +37,28 @@ logger = Logger(module="retinaface/RetinaFace.py")
 
 # configurations
 warnings.filterwarnings("ignore")
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-# Limit the amount of reserved VRAM so that other scripts can be run in the same GPU as well
-os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
 
-tf_version = int(tf.__version__.split(".", maxsplit=1)[0])
+# only the decided backend engine is imported. e.g. tensorflow is never imported for pytorch
+if backend_utils.is_tensorflow():
+    # this has to be set before importing tf
+    os.environ["TF_USE_LEGACY_KERAS"] = "1"
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+    # Limit the amount of reserved VRAM so that other scripts can be run in the same GPU as well
+    os.environ["TF_FORCE_GPU_ALLOW_GROWTH"] = "true"
 
-if tf_version == 2:
-    tf.get_logger().setLevel(logging.ERROR)
-    from tensorflow.keras.models import Model
+    import tensorflow as tf
+    from retinaface.commons import package_utils
+    from retinaface.model import retinaface_model
+
+    # users should install tf_keras package if they are using tf 2.16 or later versions
+    package_utils.validate_for_keras3()
+
+    tf_version = int(tf.__version__.split(".", maxsplit=1)[0])
+    if tf_version == 2:
+        tf.get_logger().setLevel(logging.ERROR)
 else:
-    from keras.models import Model
+    import torch
+    from retinaface.model import retinaface_pth_model
 
 # ---------------------------
 
@@ -50,19 +71,39 @@ def build_model() -> Any:
     global model  # singleton design pattern
 
     if not "model" in globals():
-        model = tf.function(
-            retinaface_model.build_model(),
-            input_signature=(tf.TensorSpec(shape=[None, None, None, 3], dtype=np.float32),),
-        )
+        if backend_utils.is_tensorflow():
+            model = tf.function(
+                retinaface_model.build_model(),
+                input_signature=(tf.TensorSpec(shape=[None, None, None, 3], dtype=np.float32),),
+            )
+        else:
+            model = retinaface_pth_model.build_model()
 
-    # pylint: disable=possibly-used-before-assignment
+    # pylint: disable=unknown-option-value, possibly-used-before-assignment
     return model
+
+
+def _predict(model: Any, im_tensor: np.ndarray) -> List[np.ndarray]:
+    """
+    Run the model on the decided backend engine
+    Args:
+        model (Any): tensorflow or pytorch model
+        im_tensor (np.ndarray): preprocessed image in (1, H, W, 3) shape
+    Returns:
+        net_out (List[np.ndarray]): model outputs in (1, H, W, C) shape
+    """
+    if backend_utils.is_tensorflow():
+        net_out = model(im_tensor)
+    else:
+        with torch.no_grad():
+            net_out = model(torch.from_numpy(np.ascontiguousarray(im_tensor)))
+    return [elt.numpy() for elt in net_out]
 
 
 def detect_faces(
     img_path: Union[str, np.ndarray],
     threshold: float = 0.9,
-    model: Optional[Model] = None,
+    model: Optional[Any] = None,
     allow_upscaling: bool = True,
 ) -> Dict[str, Any]:
     """
@@ -70,7 +111,7 @@ def detect_faces(
     Args:
         img_path (str or numpy array): given image
         threshold (float): threshold for detection
-        model (Model): pre-trained model can be given
+        model (Any): pre-trained model can be given
         allow_upscaling (bool): allowing up-scaling
     Returns:
         detected faces as:
@@ -121,8 +162,7 @@ def detect_faces(
     scores_list = []
     landmarks_list = []
     im_tensor, im_info, im_scale = preprocess.preprocess_image(img, allow_upscaling)
-    net_out = model(im_tensor)
-    net_out = [elt.numpy() for elt in net_out]
+    net_out = _predict(model, im_tensor)
     sym_idx = 0
 
     for _, s in enumerate(_feat_stride_fpn):
@@ -217,7 +257,7 @@ def detect_faces(
 def extract_faces(
     img_path: Union[str, np.ndarray],
     threshold: float = 0.9,
-    model: Optional[Model] = None,
+    model: Optional[Any] = None,
     align: bool = True,
     allow_upscaling: bool = True,
     expand_face_area: int = 0,
@@ -229,7 +269,7 @@ def extract_faces(
     Args:
         img_path (str or numpy): given image
         threshold (float): detection threshold
-        model (Model): pre-trained model can be passed to the function
+        model (Any): pre-trained model can be passed to the function
         align (bool): enable or disable alignment
         allow_upscaling (bool): allowing up-scaling
         expand_face_area (int): expand detected facial area with a percentage
