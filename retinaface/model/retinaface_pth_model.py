@@ -1,20 +1,21 @@
-import os
-from pathlib import Path
 from typing import List
 
-import gdown
 import torch
 from torch import nn
 import torch.nn.functional as F
 
-from retinaface.commons.logger import Logger
-
-logger = Logger(module="retinaface/model/retinaface_pth_model.py")
+from retinaface.commons import weight_utils
 
 # pylint: disable=too-many-instance-attributes, too-few-public-methods
 
 # every batch normalization layer of the original model uses this epsilon
 BN_EPS = 1.9999999494757503e-05
+
+# the 2nd one is a backup source, used when downloading from the 1st one fails
+WEIGHTS_URLS = [
+    "https://github.com/serengil/deepface_models/releases/download/v1.0/retinaface.pth",
+    "https://huggingface.co/serengil/deepface/resolve/main/retinaface.pth",
+]
 
 
 def _bn(channels: int) -> nn.BatchNorm2d:
@@ -235,37 +236,9 @@ def load_weights(model: RetinaFace) -> RetinaFace:
     Returns:
         model (RetinaFace): retinaface model with its structure and pre-trained weights
     """
-    home = str(os.getenv("DEEPFACE_HOME", default=str(Path.home())))
-    exact_file = home + "/.deepface/weights/retinaface.pth"
-    url = "https://github.com/serengil/deepface_models/releases/download/v1.0/retinaface.pth"
-
-    # -----------------------------
-
-    if not os.path.exists(home + "/.deepface"):
-        os.mkdir(home + "/.deepface")
-        logger.info(f"Directory {home}/.deepface created")
-
-    if not os.path.exists(home + "/.deepface/weights"):
-        os.mkdir(home + "/.deepface/weights")
-        logger.info(f"Directory {home}/.deepface/weights created")
-
-    # -----------------------------
-
-    if os.path.isfile(exact_file) is not True:
-        logger.info(f"retinaface.pth will be downloaded from the url {url}")
-        gdown.download(url, exact_file, quiet=False)
-
-    # -----------------------------
-
-    # gdown should download the pretrained weights here.
-    # If it does not still exist, then throw an exception.
-    if os.path.isfile(exact_file) is not True:
-        raise ValueError(
-            "Pre-trained weight could not be loaded!"
-            + " You might try to download the pre-trained weights from the url "
-            + url
-            + f" and copy it to the {exact_file} manually."
-        )
+    exact_file = weight_utils.download_weights_if_necessary(
+        file_name="retinaface.pth", source_urls=WEIGHTS_URLS
+    )
 
     model.load_state_dict(torch.load(exact_file, map_location="cpu", weights_only=True))
     return model
