@@ -1,14 +1,15 @@
-import os
-from pathlib import Path
-import gdown
 import tensorflow as tf
-from retinaface.commons.logger import Logger
-
-logger = Logger(module="retinaface/model/retinaface_model.py")
+from retinaface.commons import weight_utils
 
 # pylint: disable=too-many-statements, no-name-in-module
 
 # configurations
+
+# the 2nd one is a backup source, used when downloading from the 1st one fails
+WEIGHTS_URLS = [
+    "https://github.com/serengil/deepface_models/releases/download/v1.0/retinaface.h5",
+    "https://huggingface.co/serengil/deepface/resolve/main/retinaface.h5",
+]
 
 tf_version = int(tf.__version__.split(".", maxsplit=1)[0])
 
@@ -52,40 +53,9 @@ def load_weights(model: Model):
         model (Model): retinaface model with its structure and pre-trained weights
 
     """
-    home = str(os.getenv("DEEPFACE_HOME", default=str(Path.home())))
-
-    exact_file = home + "/.deepface/weights/retinaface.h5"
-    url = "https://github.com/serengil/deepface_models/releases/download/v1.0/retinaface.h5"
-
-    # -----------------------------
-
-    if not os.path.exists(home + "/.deepface"):
-        os.mkdir(home + "/.deepface")
-        logger.info(f"Directory {home}/.deepface created")
-
-    if not os.path.exists(home + "/.deepface/weights"):
-        os.mkdir(home + "/.deepface/weights")
-        logger.info(f"Directory {home}/.deepface/weights created")
-
-    # -----------------------------
-
-    if os.path.isfile(exact_file) is not True:
-        logger.info(f"retinaface.h5 will be downloaded from the url {url}")
-        gdown.download(url, exact_file, quiet=False)
-
-    # -----------------------------
-
-    # gdown should download the pretrained weights here.
-    # If it does not still exist, then throw an exception.
-    if os.path.isfile(exact_file) is not True:
-        raise ValueError(
-            "Pre-trained weight could not be loaded!"
-            + " You might try to download the pre-trained weights from the url "
-            + url
-            + " and copy it to the ",
-            exact_file,
-            "manually.",
-        )
+    exact_file = weight_utils.download_weights_if_necessary(
+        file_name="retinaface.h5", source_urls=WEIGHTS_URLS
+    )
 
     model.load_weights(exact_file)
 
