@@ -27,7 +27,8 @@ if "_DEPRECATION_WARNING_SHOWN" not in globals():
         " Currently, TensorFlow is included by default, but this behavior will be deprecated.\n"
         " Please explicitly specify your preferred backend engine when installing:\n\n"
         "   -> pip install retina-face[tensorflow]\n"
-        "   -> pip install retina-face[pytorch]\n\n"
+        "   -> pip install retina-face[pytorch]\n"
+        "   -> pip install retina-face[onnx]\n\n"
         " Otherwise, you will encounter 'module not found' errors.\n" + "=" * 70 + "\n"
     )
 
@@ -56,9 +57,13 @@ if backend_utils.is_tensorflow():
     tf_version = int(tf.__version__.split(".", maxsplit=1)[0])
     if tf_version == 2:
         tf.get_logger().setLevel(logging.ERROR)
-else:
+elif backend_utils.is_pytorch():
     import torch
     from retinaface.model import retinaface_pth_model
+elif backend_utils.is_onnx():
+    from retinaface.model import retinaface_onnx_model
+else:
+    raise ValueError(f"Unimplemented backend engine - {backend_utils.get_backend_engine()}")
 
 # ---------------------------
 
@@ -76,8 +81,12 @@ def build_model() -> Any:
                 retinaface_model.build_model(),
                 input_signature=(tf.TensorSpec(shape=[None, None, None, 3], dtype=np.float32),),
             )
-        else:
+        elif backend_utils.is_pytorch():
             model = retinaface_pth_model.build_model()
+        elif backend_utils.is_onnx():
+            model = retinaface_onnx_model.build_model()
+        else:
+            raise ValueError(f"Unimplemented backend engine - {backend_utils.get_backend_engine()}")
 
     # pylint: disable=unknown-option-value, possibly-used-before-assignment
     return model
@@ -87,16 +96,21 @@ def _predict(model: Any, im_tensor: np.ndarray) -> List[np.ndarray]:
     """
     Run the model on the decided backend engine
     Args:
-        model (Any): tensorflow or pytorch model
+        model (Any): tensorflow, pytorch or onnx model
         im_tensor (np.ndarray): preprocessed image in (1, H, W, 3) shape
     Returns:
         net_out (List[np.ndarray]): model outputs in (1, H, W, C) shape
     """
     if backend_utils.is_tensorflow():
         net_out = model(im_tensor)
-    else:
+    elif backend_utils.is_pytorch():
         with torch.no_grad():
             net_out = model(torch.from_numpy(np.ascontiguousarray(im_tensor)))
+    elif backend_utils.is_onnx():
+        # onnx runtime already returns numpy arrays
+        return model(im_tensor)
+    else:
+        raise ValueError(f"Unimplemented backend engine - {backend_utils.get_backend_engine()}")
     return [elt.numpy() for elt in net_out]
 
 

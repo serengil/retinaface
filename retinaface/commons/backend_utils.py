@@ -8,14 +8,16 @@ from retinaface.commons.logger import Logger
 
 logger = Logger(module="retinaface/commons/backend_utils.py")
 
-# retinaface can run either on tensorflow or on pytorch. this module decides which one of
+# retinaface can run on tensorflow, pytorch or onnx. this module decides which one of
 # them will be used, and it must not import any of them - importing a framework here
 # would force every user to have it installed.
 
 TENSORFLOW = "tensorflow"
 PYTORCH = "pytorch"
+ONNX = "onnx"
 
-BACKENDS = [TENSORFLOW, PYTORCH]
+# backends are tried in this order when no backend engine is enforced
+BACKENDS = [TENSORFLOW, PYTORCH, ONNX]
 
 # set this environment variable to enforce a backend engine
 BACKEND_ENGINE_ENV_VAR = "DEEPFACE_BACKEND_ENGINE"
@@ -24,6 +26,7 @@ BACKEND_ENGINE_ENV_VAR = "DEEPFACE_BACKEND_ENGINE"
 BACKEND_REQUIREMENTS = {
     TENSORFLOW: ["tensorflow"],
     PYTORCH: ["torch"],
+    ONNX: ["onnxruntime"],
 }
 
 _backend_engine: Optional[str] = None
@@ -48,7 +51,7 @@ def is_backend_available(backend: str) -> bool:
     """
     Check if every requirement of a backend engine is installed
     Args:
-        backend (str): tensorflow or pytorch
+        backend (str): tensorflow, pytorch or onnx
     Returns:
         available (bool)
     """
@@ -60,9 +63,10 @@ def get_backend_engine() -> str:
     Find the backend engine retinaface will run on. It is set once and then cached.
 
     The engine is the one the DEEPFACE_BACKEND_ENGINE environment variable enforces,
-    or tensorflow when it is installed, or pytorch when it is installed.
+    or tensorflow when it is installed, or pytorch when it is installed,
+    or onnx when onnxruntime is installed.
     Returns:
-        backend (str): tensorflow or pytorch
+        backend (str): tensorflow, pytorch or onnx
     """
     global _backend_engine  # pylint: disable=global-statement
 
@@ -97,9 +101,10 @@ def get_backend_engine() -> str:
             return _backend_engine
 
     raise ValueError(
-        "retinaface requires either tensorflow or pytorch to be installed, but none of them "
-        "is available. Please run `pip install retina-face[tensorflow]` or "
-        "`pip install retina-face[pytorch]` to install the backend engine you want to use."
+        "retinaface requires either tensorflow, pytorch or onnxruntime to be installed, but "
+        "none of them is available. Please run `pip install retina-face[tensorflow]`, "
+        "`pip install retina-face[pytorch]` or `pip install retina-face[onnx]` to install "
+        "the backend engine you want to use."
     )
 
 
@@ -119,3 +124,12 @@ def is_pytorch() -> bool:
         result (bool)
     """
     return get_backend_engine() == PYTORCH
+
+
+def is_onnx() -> bool:
+    """
+    Check if retinaface runs on onnx
+    Returns:
+        result (bool)
+    """
+    return get_backend_engine() == ONNX
