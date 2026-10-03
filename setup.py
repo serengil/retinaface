@@ -16,11 +16,12 @@ def parse_requirements(file_name):
 # existing users. switch it to requirements_base.txt in the next major release.
 requirements = parse_requirements("requirements.txt")
 
-# retinaface runs either on tensorflow or on pytorch. `pip install retina-face[tensorflow]`
-# and `pip install retina-face[pytorch]` install the backend engine you want, without
-# dragging the other one in.
+# retinaface runs on tensorflow, pytorch or onnx. `pip install retina-face[tensorflow]`,
+# `pip install retina-face[pytorch]` and `pip install retina-face[onnx]` install the backend
+# engine you want, without dragging the others in.
 tensorflow_requirements = parse_requirements("requirements_tf.txt")
 pytorch_requirements = parse_requirements("requirements_pth.txt")
+onnx_requirements = parse_requirements("requirements_onnx.txt")
 
 with open("package_info.json", "r", encoding="utf-8") as f:
     package_info = json.load(f)
@@ -31,7 +32,7 @@ setuptools.setup(
     version=package_info["version"],
     author="Sefik Ilkin Serengil",
     author_email="serengil@gmail.com",
-    description="RetinaFace: Deep Face Detection Framework in TensorFlow and PyTorch for Python",
+    description="RetinaFace: Deep Face Detection Framework in TensorFlow, PyTorch and ONNX for Python",
     data_files=[
         (
             "",
@@ -41,6 +42,7 @@ setuptools.setup(
                 "requirements_base.txt",
                 "requirements_tf.txt",
                 "requirements_pth.txt",
+                "requirements_onnx.txt",
                 "package_info.json",
             ],
         )
@@ -59,5 +61,6 @@ setuptools.setup(
     extras_require={
         "tensorflow": tensorflow_requirements,
         "pytorch": pytorch_requirements,
+        "onnx": onnx_requirements,
     },
 )
