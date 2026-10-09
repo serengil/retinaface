@@ -29,6 +29,13 @@ BACKEND_REQUIREMENTS = {
     ONNX: ["onnxruntime"],
 }
 
+# commands installing a backend engine. onnxruntime comes with the base requirements.
+BACKEND_INSTALL_COMMANDS = {
+    TENSORFLOW: "pip install retina-face[tensorflow]",
+    PYTORCH: "pip install retina-face[pytorch]",
+    ONNX: "pip install onnxruntime",
+}
+
 _backend_engine: Optional[str] = None
 
 
@@ -87,7 +94,7 @@ def get_backend_engine() -> str:
             verb = "is" if len(packages) == 1 else "are"
             raise ValueError(
                 f"{BACKEND_ENGINE_ENV_VAR} is set to {backend} but {requirements} "
-                f"{verb} not installed. Please run `pip install retina-face[{backend}]` "
+                f"{verb} not installed. Please run `{BACKEND_INSTALL_COMMANDS[backend]}` "
                 f"or unset {BACKEND_ENGINE_ENV_VAR}."
             )
         logger.debug(f"{backend} backend engine is enforced with {BACKEND_ENGINE_ENV_VAR}")
@@ -102,8 +109,9 @@ def get_backend_engine() -> str:
 
     raise ValueError(
         "retinaface requires either tensorflow, pytorch or onnxruntime to be installed, but "
-        "none of them is available. Please run `pip install retina-face[tensorflow]`, "
-        "`pip install retina-face[pytorch]` or `pip install retina-face[onnx]` to install "
+        "none of them is available. onnxruntime comes with retina-face, so your installation "
+        "may be broken. Please run `pip install onnxruntime`, "
+        "`pip install retina-face[tensorflow]` or `pip install retina-face[pytorch]` to install "
         "the backend engine you want to use."
     )
 

@@ -12,16 +12,13 @@ def parse_requirements(file_name):
     return [line for line in lines if line and not line.startswith("#")]
 
 
-# requirements.txt still includes tensorflow not to break `pip install retina-face` for
-# existing users. switch it to requirements_base.txt in the next major release.
-requirements = parse_requirements("requirements.txt")
+requirements = parse_requirements("requirements_base.txt")
 
-# retinaface runs on tensorflow, pytorch or onnx. `pip install retina-face[tensorflow]`,
-# `pip install retina-face[pytorch]` and `pip install retina-face[onnx]` install the backend
-# engine you want, without dragging the others in.
+# onnxruntime comes with the base requirements, so `pip install retina-face` runs on onnx out of
+# the box. `pip install retina-face[tensorflow]` and `pip install retina-face[pytorch]` install
+# tensorflow or pytorch as the backend engine instead, without dragging the other in.
 tensorflow_requirements = parse_requirements("requirements_tf.txt")
 pytorch_requirements = parse_requirements("requirements_pth.txt")
-onnx_requirements = parse_requirements("requirements_onnx.txt")
 
 with open("package_info.json", "r", encoding="utf-8") as f:
     package_info = json.load(f)
@@ -38,11 +35,9 @@ setuptools.setup(
             "",
             [
                 "README.md",
-                "requirements.txt",
                 "requirements_base.txt",
                 "requirements_tf.txt",
                 "requirements_pth.txt",
-                "requirements_onnx.txt",
                 "package_info.json",
             ],
         )
@@ -61,6 +56,5 @@ setuptools.setup(
     extras_require={
         "tensorflow": tensorflow_requirements,
         "pytorch": pytorch_requirements,
-        "onnx": onnx_requirements,
     },
 )
