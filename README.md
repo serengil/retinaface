@@ -19,17 +19,17 @@ RetinaFace is the face detection module of [insightface](https://github.com/deep
 
 ## Installation [![PyPI](https://img.shields.io/pypi/v/retina-face.svg)](https://pypi.org/project/retina-face/)
 
-The easiest way to install retinaface is to download it from [PyPI](https://pypi.org/project/retina-face/). RetinaFace runs on TensorFlow, PyTorch or ONNX Runtime, so install it with the backend engine you want to use.
+The easiest way to install retinaface is to download it from [PyPI](https://pypi.org/project/retina-face/). RetinaFace runs on TensorFlow, PyTorch or ONNX Runtime. ONNX Runtime comes with the base installation, so retinaface works out of the box.
 
 ```shell
-# to run retinaface on top of tensorflow
-$ pip install retina-face[tensorflow]
+# to run retinaface on top of onnx runtime
+$ pip install retina-face
+
+# or to run retinaface on top of tensorflow
+# $ pip install retina-face[tensorflow]
 
 # or to run retinaface on top of pytorch
 # $ pip install retina-face[pytorch]
-
-# or to run retinaface on top of onnx runtime
-# $ pip install retina-face[onnx]
 
 # manage the backend deep learning framework if you have many
 # export DEEPFACE_BACKEND_ENGINE=onnx 
@@ -40,7 +40,7 @@ Alternatively, you can also install deepface from its source code. Source code m
 ```shell
 $ git clone https://github.com/serengil/retinaface.git
 $ cd retinaface
-$ pip install -e .[tensorflow]  # or pip install -e .[pytorch] or .[onnx]
+$ pip install -e .  # or pip install -e .[tensorflow] or .[pytorch]
 ```
 
 Then, you will be able to import the library and use its functionalities.

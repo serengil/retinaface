@@ -1,10 +1,8 @@
 # built-in dependencies
-import math
 from typing import Union, Tuple
 
 # 3rd party dependencies
 import numpy as np
-from PIL import Image
 import cv2
 
 # pylint: disable=unused-argument
@@ -33,87 +31,65 @@ def find_euclidean_distance(
     return euclidean_distance
 
 
-def alignment_procedure(
-    img: np.ndarray, left_eye: tuple, right_eye: tuple, nose: tuple
-) -> Tuple[np.ndarray, float, int]:
+def align_img_wrt_eyes(
+    img: np.ndarray,
+    left_eye: Union[list, tuple],
+    right_eye: Union[list, tuple],
+) -> Tuple[np.ndarray, float]:
     """
-    Alignma given face with respect to the left and right eye coordinates.
-    Left eye is the eye appearing on the left (right eye of the person). Left top point is (0, 0)
+    Align a given image horizantally with respect to their left and right eye locations
     Args:
-        img (numpy array): given image
-        left_eye (tuple): left eye coordinates.
-            Left eye is appearing on the left of image (right eye of the person)
-        right_eye (tuple): right eye coordinates.
-            Right eye is appearing on the right of image (left eye of the person)
-        nose (tuple): coordinates of nose
+        img (np.ndarray): pre-loaded image with detected face
+        left_eye (list or tuple): coordinates of left eye with respect to the person itself
+        right_eye (list or tuple): coordinates of right eye with respect to the person itself
+    Returns:
+        img (np.ndarray): aligned image
+        angle (float): rotation angle in degrees
     """
+    # sometimes unexpectedly detected images come with nil dimensions
+    if img.shape[0] == 0 or img.shape[1] == 0:
+        return img, 0
 
-    left_eye_x, left_eye_y = left_eye
-    right_eye_x, right_eye_y = right_eye
+    angle = float(np.degrees(np.arctan2(left_eye[1] - right_eye[1], left_eye[0] - right_eye[0])))
 
-    # -----------------------
-    # find rotation direction
-    if left_eye_y > right_eye_y:
-        point_3rd = (right_eye_x, left_eye_y)
-        direction = -1  # rotate same direction to clock
-    else:
-        point_3rd = (left_eye_x, right_eye_y)
-        direction = 1  # rotate inverse direction of clock
+    (h, w) = img.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    img = cv2.warpAffine(
+        img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0)
+    )
 
-    # -----------------------
-    # find length of triangle edges
-
-    a = find_euclidean_distance(np.array(left_eye), np.array(point_3rd))
-    b = find_euclidean_distance(np.array(right_eye), np.array(point_3rd))
-    c = find_euclidean_distance(np.array(right_eye), np.array(left_eye))
-
-    # -----------------------
-    # apply cosine rule
-    if b != 0 and c != 0:  # this multiplication causes division by zero in cos_a calculation
-
-        cos_a = (b * b + c * c - a * a) / (2 * b * c)
-
-        # PR15: While mathematically cos_a must be within the closed range [-1.0, 1.0],
-        # floating point errors would produce cases violating this
-        # In fact, we did come across a case where cos_a took the value 1.0000000169176173
-        # which lead to a NaN from the following np.arccos step
-        cos_a = min(1.0, max(-1.0, cos_a))
-
-        angle = np.arccos(cos_a)  # angle in radian
-        angle = (angle * 180) / math.pi  # radian to degree
-
-        # -----------------------
-        # rotate base image
-
-        if direction == -1:
-            angle = 90 - angle
-
-        img = Image.fromarray(img)
-        img = np.array(img.rotate(direction * angle))
-    else:
-        angle = 0.0  # Dummy value for undefined angle
-
-    # -----------------------
-
-    return img, angle, direction
+    return img, angle
 
 
-def rotate_facial_area(
-    facial_area: Tuple[int, int, int, int], angle: float, direction: int, size: Tuple[int, int]
+def project_facial_area(
+    facial_area: Tuple[int, int, int, int], angle: float, size: Tuple[int, int]
 ) -> Tuple[int, int, int, int]:
     """
-    Rotate the facial area around its center.
+    Update pre-calculated facial area coordinates after image itself
+        rotated with respect to the eyes.
+    Inspried from the work of @UmutDeniz26 - github.com/serengil/retinaface/pull/80
 
     Args:
         facial_area (tuple of int): Representing the (x1, y1, x2, y2) of the facial area.
-        angle (float): Angle of rotation in degrees.
-        direction (int): Direction of rotation (-1 for clockwise, 1 for counterclockwise).
-        size (tuple of int): Tuple representing the size of the image (width, height).
+        angle (float): Angle of rotation in degrees. Its sign determines the direction of rotation.
+                       Note that angles > 360 degrees are normalized to the range [0, 360).
+        size (tuple of int): Tuple representing the size of the image (height, width).
 
     Returns:
         rotated_facial_area (tuple of int): Representing the new coordinates
             (x1, y1, x2, y2) of the rotated facial area.
     """
+
+    # Normalize the witdh of the angle so we don't have to
+    # worry about rotations greater than 360 degrees.
+    # We workaround the quirky behavior of the modulo operator
+    # for negative angle values.
+    direction = 1 if angle >= 0 else -1
+    angle = abs(angle) % 360
+    if angle == 0:
+        return facial_area
+
     # Angle in radians
     angle = angle * np.pi / 180
 

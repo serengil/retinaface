@@ -54,7 +54,12 @@ def load_weights() -> ort.InferenceSession:
         for provider in ["CUDAExecutionProvider", "CPUExecutionProvider"]
         if provider in available
     ]
-    return ort.InferenceSession(exact_file, providers=providers)
+
+    # only log errors, some graphs flood stderr with harmless optimization warnings
+    session_options = ort.SessionOptions()
+    session_options.log_severity_level = 3
+
+    return ort.InferenceSession(exact_file, sess_options=session_options, providers=providers)
 
 
 def build_model() -> RetinaFace:

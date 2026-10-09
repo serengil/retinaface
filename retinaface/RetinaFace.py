@@ -8,29 +8,7 @@ import numpy as np
 
 from retinaface import __version__
 from retinaface.commons import preprocess, postprocess
-from retinaface.commons.logger import Logger
 from retinaface.commons import backend_utils
-
-logger = Logger(module="retinaface/RetinaFace.py")
-
-# -----------------------------------
-# warn users about upcoming changes in backend installation.
-
-if "_DEPRECATION_WARNING_SHOWN" not in globals():
-    global _DEPRECATION_WARNING_SHOWN  # pylint: disable=global-at-module-level
-    _DEPRECATION_WARNING_SHOWN = True
-    logger.warn(
-        "\n" + "=" * 70 + "\n"
-        " ⚠️ DEPRECATION WARNING:\n"
-        " Running 'pip install retina-face' alone will no longer be sufficient and will\n"
-        " NOT install a default backend in an upcoming major release.\n\n"
-        " Currently, TensorFlow is included by default, but this behavior will be deprecated.\n"
-        " Please explicitly specify your preferred backend engine when installing:\n\n"
-        "   -> pip install retina-face[tensorflow]\n"
-        "   -> pip install retina-face[pytorch]\n"
-        "   -> pip install retina-face[onnx]\n\n"
-        " Otherwise, you will encounter 'module not found' errors.\n" + "=" * 70 + "\n"
-    )
 
 # pylint: disable=global-variable-undefined, no-name-in-module, unused-import, too-many-locals, redefined-outer-name, too-many-statements, too-many-arguments
 
@@ -312,8 +290,6 @@ def extract_faces(
 
     for _, identity in obj.items():
         facial_area = identity["facial_area"]
-        rotate_angle = 0
-        rotate_direction = 1
 
         x = facial_area[0]
         y = facial_area[1]
@@ -336,18 +312,16 @@ def extract_faces(
             landmarks = identity["landmarks"]
             left_eye = landmarks["left_eye"]
             right_eye = landmarks["right_eye"]
-            nose = landmarks["nose"]
-            # mouth_right = landmarks["mouth_right"]
-            # mouth_left = landmarks["mouth_left"]
 
-            # notice that left eye of one is seen on the right from your perspective
-            aligned_img, rotate_angle, rotate_direction = postprocess.alignment_procedure(
-                img=img, left_eye=right_eye, right_eye=left_eye, nose=nose
+            aligned_img, rotate_angle = postprocess.align_img_wrt_eyes(
+                img=img, left_eye=left_eye, right_eye=right_eye
             )
 
             # find new facial area coordinates after alignment
-            rotated_x1, rotated_y1, rotated_x2, rotated_y2 = postprocess.rotate_facial_area(
-                (x, y, x + w, y + h), rotate_angle, rotate_direction, (img.shape[0], img.shape[1])
+            rotated_x1, rotated_y1, rotated_x2, rotated_y2 = postprocess.project_facial_area(
+                facial_area=(x, y, x + w, y + h),
+                angle=rotate_angle,
+                size=(img.shape[0], img.shape[1]),
             )
             facial_img = aligned_img[
                 int(rotated_y1) : int(rotated_y2), int(rotated_x1) : int(rotated_x2)
